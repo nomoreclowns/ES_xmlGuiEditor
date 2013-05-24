@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="ES_XML_Editor.BaseWrapPanelDataItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Horizontal">
+		<TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Center"/>
+		<TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding Text, ElementName=textBox, Mode=OneWay}" VerticalAlignment="Center"/>
+		<TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" Visibility="Collapsed"/>
+	</StackPanel>
+</UserControl>

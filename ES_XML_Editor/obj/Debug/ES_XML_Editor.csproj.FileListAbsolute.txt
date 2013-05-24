@@ -14,3 +14,7 @@ E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_
 E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\EditorController.baml
 E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\App.baml
 E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\EditorController.g.cs
+E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\BaseWrapPanelDataItem.baml
+E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\BaseWrapPanelDataItem.g.cs
+E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\GeneratedInternalTypeHelper.g.cs
+E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\ES_XML_Editor_MarkupCompile.lref

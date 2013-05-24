@@ -41,7 +41,8 @@ namespace ES_XML_Editor
             settings.progName);
 
 
-
+            baseWindowObject = new MainWindow();
+            baseWindowObject.Show();
         }
     }
 
@@ -57,5 +58,8 @@ namespace ES_XML_Editor
     }
 
 
+    public class FileHandler
+    {
+    }
     
 }

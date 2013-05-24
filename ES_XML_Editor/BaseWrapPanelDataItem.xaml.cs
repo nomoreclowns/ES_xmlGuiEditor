@@ -16,22 +16,13 @@ using System.Windows.Shapes;
 namespace ES_XML_Editor
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for BaseWrapPanelDataItem.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class BaseWrapPanelDataItem : UserControl
     {
-        EditorController controllerReference;
-
-        public MainWindow()
+        public BaseWrapPanelDataItem()
         {
             InitializeComponent();
-        }
-
-        public MainWindow(EditorController newReference)
-        {
-            InitializeComponent();
-
-            controllerReference = newReference;
         }
     }
 }
