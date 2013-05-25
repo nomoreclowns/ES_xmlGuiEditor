@@ -28,12 +28,13 @@ namespace ES_XML_Editor
     /// </summary>
     public partial class EditorController : Window
     {
-        static EditorSettings settings = EditorSettings.Default;
+        private static EditorSettings settings = EditorSettings.Default;
 
+        MainWindow baseWindowObject;
+
+        //default constructor
         public EditorController()
         {
-            MainWindow baseWindowObject;
-
             InitializeComponent();
 
             String settingsPath = System.IO.Path.Combine(
@@ -41,12 +42,31 @@ namespace ES_XML_Editor
             settings.progName);
 
 
-            baseWindowObject = new MainWindow();
+            baseWindowObject = new MainWindow(this);
             baseWindowObject.Show();
+            
         }
+
+        public void showErrorMessage(String messageOfDoom)
+        {
+            MessageBox.Show(this, messageOfDoom,"Error!", MessageBoxButton.OK);
+        }
+
+        public void closeProgram()
+        {
+            try
+            {
+                this.Close();
+            }
+            catch (InvalidOperationException e)
+            {
+                showErrorMessage("Invalid operation exception caught in function EditorController.closeProgram().");
+            }
+        }
+
     }
 
-
+    //class for handling the user's settings file
     public class SettingsManager
     {
         private String settingsFile;

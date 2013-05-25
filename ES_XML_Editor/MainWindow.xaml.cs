@@ -22,16 +22,22 @@ namespace ES_XML_Editor
     {
         EditorController controllerReference;
 
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
-
         public MainWindow(EditorController newReference)
         {
             InitializeComponent();
 
+            if (newReference == null)
+            {
+                throw new NullReferenceException("MainWindow Constructor cannot have a null reference to program controller");
+            }
             controllerReference = newReference;
+            
         }
+
+        private void closingWindow(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            controllerReference.closeProgram();
+        }
+
     }
 }
