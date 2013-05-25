@@ -13,11 +13,11 @@ namespace ES_XML_Editor {
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "11.0.0.0")]
-    internal sealed partial class EditorSettings : global::System.Configuration.ApplicationSettingsBase {
+    internal sealed partial class ProgramSettings : global::System.Configuration.ApplicationSettingsBase {
         
-        private static EditorSettings defaultInstance = ((EditorSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new EditorSettings())));
+        private static ProgramSettings defaultInstance = ((ProgramSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new ProgramSettings())));
         
-        public static EditorSettings Default {
+        public static ProgramSettings Default {
             get {
                 return defaultInstance;
             }

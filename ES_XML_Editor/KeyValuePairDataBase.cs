@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace SoftwareEng
+namespace ES_XML_Editor
 {
     /// By Julian Nguyen
     /// Edited: Julian Nguyen(5/7/13)

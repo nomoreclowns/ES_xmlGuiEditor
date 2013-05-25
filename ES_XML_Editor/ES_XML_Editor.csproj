@@ -74,12 +74,14 @@
     <Compile Include="EditorController.xaml.cs">
       <DependentUpon>EditorController.xaml</DependentUpon>
     </Compile>
-    <Compile Include="EditorSettings.Designer.cs">
+    <Compile Include="ProgramSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>EditorSettings.settings</DependentUpon>
+      <DependentUpon>ProgramSettings.settings</DependentUpon>
     </Compile>
+    <Compile Include="KeyValuePairDataBase.cs" />
     <Compile Include="WeaponModule.cs" />
+    <Compile Include="XmlLoader.cs" />
     <Page Include="BaseWrapPanelDataItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -119,9 +121,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="EditorSettings.settings">
+    <None Include="ProgramSettings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>EditorSettings.Designer.cs</LastGenOutput>
+      <LastGenOutput>ProgramSettings.Designer.cs</LastGenOutput>
     </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

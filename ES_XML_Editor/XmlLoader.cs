@@ -15,7 +15,7 @@ using System.Text;
 using System.IO;
 using System.Xml.Serialization;
 
-namespace SoftwareEng
+namespace ES_XML_Editor
 {
 
     /// By Julian Nguyen

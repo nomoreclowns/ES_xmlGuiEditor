@@ -8,16 +8,8 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Text;
 using System.Windows;
-//using System.Windows.Controls;
-//using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
-//using System.Windows.Input;
-//using System.Windows.Media;
-//using System.Windows.Media.Imaging;
-//using System.Windows.Media.Animation;
-//using System.Windows.Navigation;
-//using System.Windows.Shapes;
 using Microsoft.Win32;
 using System.Timers;
 
@@ -29,12 +21,20 @@ namespace ES_XML_Editor
     /// </summary>
     public partial class EditorController : Window
     {
-        private static EditorSettings settings = EditorSettings.Default;
+        // Shortcut variable for quicker access to the .settings file
+        private static ProgramSettings settings = ProgramSettings.Default;
 
-        private SettingsManager settingsManagerInstance;
+        // String to hold the directory for program files on the users computer
+        String ProgramFolder;
 
+        // Manager for the users' settings file
+        private KeyValuePairDataBase settingsFile;
+
+        // String to hold the users' last visited directory when using this program.
+        // Eventually gets stored as a setting in a file
         private String directoryLastUsed;
 
+        //instance of the base window
         MainWindow baseWindowObject;
 
         //default constructor
@@ -42,11 +42,18 @@ namespace ES_XML_Editor
         {
             InitializeComponent();
 
-            String settingsPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), settings.progName);
+            ProgramFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), settings.progName);
 
-            settingsManagerInstance = new SettingsManager(settingsPath);
+            String settingsPath = System.IO.Path.Combine(ProgramFolder, "settings.xml");
 
-            directoryLastUsed = settingsManagerInstance.findSetting(EditorSettings.lastUsedDirectory);
+            retrieveSettingsFile(settingsPath);
+
+            directoryLastUsed = settingsFile.getValue(EditorSettings.lastUsedDirectory.ToString());
+
+            if (directoryLastUsed == null)
+            {
+                directoryLastUsed= Environment.GetFolderPath(Environment.SpecialFolder.MyComputer);
+            }
 
             baseWindowObject = new MainWindow(this);
             baseWindowObject.Show();
@@ -59,8 +66,45 @@ namespace ES_XML_Editor
 
             fileChooser.Multiselect = false;
             fileChooser.Filter = "XML|*.xml;";
+            fileChooser.InitialDirectory = @directoryLastUsed;
+
+            if (fileChooser.ShowDialog(this) == true)
+            {
+                ;
+            }
         }
 
+        
+
+        public void retrieveSettingsFile(String filePath)
+        {
+            try
+            {
+                settingsFile = new KeyValuePairDataBase(filePath);
+            }
+            catch
+            {
+                settingsFile= new KeyValuePairDataBase();
+            }
+        }
+
+        //public String findSetting(EditorSettings setting)
+        //{
+        //    String returnableSetting = null;
+
+        //    switch (setting)
+        //    {
+        //        case EditorSettings.lastUsedDirectory:
+        //            returnableSetting = settingsFile.getValue(setting.ToString());
+        //            break;
+        //    }
+        //    return returnableSetting;
+        //}
+
+        //public void setSetting(EditorSettings setting, String settingValue)
+        //{
+        //    settingsFile.setKeyValuePair(setting.ToString(), settingValue);
+        //}
 
         public void showErrorMessage(String messageOfDoom)
         {
@@ -73,7 +117,7 @@ namespace ES_XML_Editor
             {
                 this.Close();
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 showErrorMessage("Invalid operation exception caught in function EditorController.closeProgram().");
             }
@@ -84,26 +128,7 @@ namespace ES_XML_Editor
     //class for handling the user's settings file
     public class SettingsManager
     {
-        private KeyValuePairDatabase settingsFile;
 
-        public SettingsManager(String filePath)
-        {
-            //settingsFile= filePath;
-        }
-
-        public String findSetting(EditorSettings setting)
-        {
-            String returnableSetting = null;
-
-            switch (setting)
-            {
-                case EditorSettings.lastUsedDirectory:
-                    break;
-                default:
-                    return null;
-            }
-            return null;
-        }
     }
 
 
