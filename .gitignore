@@ -1,1 +1,6 @@
 # git ignore file
+
+[Bb]in
+[Dd]ebug*/
+obj/
+*.suo
