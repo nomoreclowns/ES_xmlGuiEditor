@@ -5,6 +5,7 @@ using System.Configuration;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using System.Text;
 using System.Windows;
 //using System.Windows.Controls;
@@ -30,6 +31,10 @@ namespace ES_XML_Editor
     {
         private static EditorSettings settings = EditorSettings.Default;
 
+        private SettingsManager settingsManagerInstance;
+
+        private String directoryLastUsed;
+
         MainWindow baseWindowObject;
 
         //default constructor
@@ -37,15 +42,25 @@ namespace ES_XML_Editor
         {
             InitializeComponent();
 
-            String settingsPath = System.IO.Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            settings.progName);
+            String settingsPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), settings.progName);
 
+            settingsManagerInstance = new SettingsManager(settingsPath);
+
+            directoryLastUsed = settingsManagerInstance.findSetting(EditorSettings.lastUsedDirectory);
 
             baseWindowObject = new MainWindow(this);
             baseWindowObject.Show();
             
         }
+
+        public void openFileChooser()
+        {
+            OpenFileDialog fileChooser = new OpenFileDialog();
+
+            fileChooser.Multiselect = false;
+            fileChooser.Filter = "XML|*.xml;";
+        }
+
 
         public void showErrorMessage(String messageOfDoom)
         {
@@ -69,11 +84,25 @@ namespace ES_XML_Editor
     //class for handling the user's settings file
     public class SettingsManager
     {
-        private String settingsFile;
+        private KeyValuePairDatabase settingsFile;
 
         public SettingsManager(String filePath)
         {
-            settingsFile= filePath;
+            //settingsFile= filePath;
+        }
+
+        public String findSetting(EditorSettings setting)
+        {
+            String returnableSetting = null;
+
+            switch (setting)
+            {
+                case EditorSettings.lastUsedDirectory:
+                    break;
+                default:
+                    return null;
+            }
+            return null;
         }
     }
 
@@ -81,5 +110,10 @@ namespace ES_XML_Editor
     public class FileHandler
     {
     }
-    
+
+
+    public enum EditorSettings
+    {
+        lastUsedDirectory
+    }
 }

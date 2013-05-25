@@ -1,5 +1,14 @@
 ﻿<Window x:Class="ES_XML_Editor.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Height="350" Width="525" WindowStyle="ThreeDBorderWindow" Closing="closingWindow" WindowStartupLocation="CenterScreen" ShowInTaskbar="False">
-    <Grid/>
+    <Grid>
+    	<Grid.RowDefinitions>
+    		<RowDefinition Height="11*"/>
+    		<RowDefinition Height="149*"/>
+    	</Grid.RowDefinitions>
+    	<ListBox Grid.Row="1" Background="#FFD1D1D1"/>
+    	<StackPanel Background="#FFC1C1C1">
+    		<Button Content="Open File" HorizontalAlignment="Left" Click="openFileButtonClick"/>
+    	</StackPanel>
+    </Grid>
 </Window>

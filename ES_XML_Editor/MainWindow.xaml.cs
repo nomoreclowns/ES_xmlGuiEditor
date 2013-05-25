@@ -39,5 +39,10 @@ namespace ES_XML_Editor
             controllerReference.closeProgram();
         }
 
+        private void openFileButtonClick(object sender, RoutedEventArgs e)
+        {
+
+        }
+
     }
 }
