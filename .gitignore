@@ -1,10 +1,10 @@
 # git ignore file
 
-*ES_XML_Editor/[Bb]in
+*ES_XML_Editor/[Bb]in*/
 *ES_XML_Editor/[Dd]ebug*/
-*ES_XML_Editor/obj/
+*ES_XML_Editor/obj*/
 *ES_XML_Editor.suo
-[Bb]in
+[Bb]in*/
 [Dd]ebug*/
-obj/
+obj*/
 
