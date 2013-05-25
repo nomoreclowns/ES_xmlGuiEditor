@@ -10,7 +10,6 @@ e:\my collections\my documents\visual studio 2012\Projects\ES_XML_Editor\ES_XML_
 e:\my collections\my documents\visual studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\ES_XML_Editor.csproj.GenerateResource.Cache
 e:\my collections\my documents\visual studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\ES_XML_Editor.exe
 e:\my collections\my documents\visual studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\ES_XML_Editor.pdb
-E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\ES_XML_Editor.csprojResolveAssemblyReference.cache
 E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\EditorController.baml
 E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\App.baml
 E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\EditorController.g.cs
@@ -18,3 +17,4 @@ E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_
 E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\BaseWrapPanelDataItem.g.cs
 E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\GeneratedInternalTypeHelper.g.cs
 E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\ES_XML_Editor_MarkupCompile.lref
+E:\My Collections\My Documents\Visual Studio 2012\Projects\ES_XML_Editor\ES_XML_Editor\obj\Debug\ES_XML_Editor.csprojResolveAssemblyReference.cache
