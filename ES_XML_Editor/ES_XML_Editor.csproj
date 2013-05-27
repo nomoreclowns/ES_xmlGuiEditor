@@ -74,6 +74,7 @@
     <Compile Include="EditorController.xaml.cs">
       <DependentUpon>EditorController.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FileHandler.cs" />
     <Compile Include="GuiAndControllerInterface.cs" />
     <Compile Include="ProgramSettings.Designer.cs">
       <AutoGen>True</AutoGen>
