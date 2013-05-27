@@ -7,7 +7,11 @@ using System.ComponentModel;
 
 namespace ES_XML_Editor
 {
-    public class WeaponModule : INotifyPropertyChanged
+
+    //NOTE TO SELF: do yourself a favor and  BIND DIRECTLY TO XML!!!!!
+    //
+
+    public class zzWeaponModule : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -203,6 +207,24 @@ namespace ES_XML_Editor
             }
         }
 
+        public String accuracy
+        {
+            set
+            {
+                if (value != pSimulationInstance.pAccuracy)
+                {
+                    pSimulationInstance.pAccuracy = value;
+                }
+
+                //call on property changed to update the GUI(hopefully)
+                OnPropertyChanged("accuracy");
+            }
+            get
+            {
+                return pSimulationInstance.pAccuracy;
+            }
+        }
+
         public String turnBeforeReach
         {
             set
@@ -335,6 +357,24 @@ namespace ES_XML_Editor
             }
         }
 
+        public String projectilesPrefabs
+        {
+            set
+            {
+                if (value != pReflectionInstance.pProjectilesPrefabs.pPath)
+                {
+                    pReflectionInstance.pProjectilesPrefabs.pPath = value;
+                }
+
+                //call on property changed to update the GUI(hopefully)
+                OnPropertyChanged("projectilesPrefabs");
+            }
+            get
+            {
+                return pReflectionInstance.pProjectilesPrefabs.pPath;
+            }
+        }
+
         #endregion
 
         private Gui pGuiInstance;
@@ -415,9 +455,10 @@ namespace ES_XML_Editor
 
         #endregion
 
-
-        //default constructor
-        public WeaponModule()
+        /* ************************************************************************************************************************
+         * default constructor
+         *************************************************************************************************************************/
+        public zzWeaponModule()
         {
             pName = "Unknown";
             pCost = "Unknown";
@@ -431,8 +472,10 @@ namespace ES_XML_Editor
             pGuiInstance = new Gui();
         }
 
-        //overloaded constructor
-        public WeaponModule(String suppliedName, String suppliedCost, String suppliedWeight, String suppliedMP)
+        /* ************************************************************************************************************************
+         * overloaded constructor
+         *************************************************************************************************************************/
+        public zzWeaponModule(String suppliedName, String suppliedCost, String suppliedWeight, String suppliedMP)
         {
             pName = suppliedName;
             pCost = suppliedCost;
@@ -446,7 +489,8 @@ namespace ES_XML_Editor
             pGuiInstance = new Gui();
         }
 
-
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
         protected void OnPropertyChanged(String name)
         {
             PropertyChangedEventHandler changedHandler = PropertyChanged;
@@ -478,6 +522,8 @@ namespace ES_XML_Editor
 
         public String pNumberPerSalve;
 
+        public String pAccuracy;
+
         public String pTurnBeforeReach;
 
         public String pTurnToReload;
@@ -492,6 +538,7 @@ namespace ES_XML_Editor
             pCriticChance = "Unknown";
             pInterceptionEvasion = "Unknown";
             pNumberPerSalve = "Unknown";
+            pAccuracy = "Unknown";
             pTurnBeforeReach = "Unknown";
             pTurnToReload = "Unknown";
             pWeaponClass = "Unknown";

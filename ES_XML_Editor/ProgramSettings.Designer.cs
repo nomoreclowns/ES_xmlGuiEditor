@@ -34,5 +34,17 @@ namespace ES_XML_Editor {
                 this["progName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Datatable")]
+        public string xmlRootElementName {
+            get {
+                return ((string)(this["xmlRootElementName"]));
+            }
+            set {
+                this["xmlRootElementName"] = value;
+            }
+        }
     }
 }

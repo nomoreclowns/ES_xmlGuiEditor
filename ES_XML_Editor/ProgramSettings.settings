@@ -1,9 +1,12 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ES_XML_Editor" GeneratedClassName="EditorSettings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ES_XML_Editor" GeneratedClassName="ProgramSettings">
   <Profiles />
   <Settings>
     <Setting Name="progName" Type="System.String" Scope="User">
       <Value Profile="(Default)">ES_XML_Editor</Value>
+    </Setting>
+    <Setting Name="xmlRootElementName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Datatable</Value>
     </Setting>
   </Settings>
 </SettingsFile>

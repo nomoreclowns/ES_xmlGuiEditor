@@ -4,7 +4,7 @@
              xmlns:ESXE="clr-namespace:ES_XML_Editor"
              StartupUri="EditorController.xaml" ShutdownMode="OnMainWindowClose">
     <Application.Resources>
-        <DataTemplate DataType="{x:Type ESXE:WeaponModule}">
+        <DataTemplate DataType="WeaponModule">
         	<Grid Height="136.5" Width="241">
         		<ListBox HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Top" Width="Auto" SelectionMode="Extended" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
                     <ListBox.ItemsPanel>
@@ -13,9 +13,11 @@
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
                     <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Horizontal">
-                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Name:" VerticalAlignment="Center"/>
-                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding Text, ElementName=textBox, Mode=OneWay}" VerticalAlignment="Center"/>
-                        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding name}" VerticalAlignment="Top" Width="120" Visibility="Collapsed"/>
+                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Name: " VerticalAlignment="Center"/>
+                        <!--
+                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        -->
+                        <TextBox x:Name="textBox" HorizontalAlignment="Left" Text="{Binding Path=Attribute[Name].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Visibility="Collapsed"/>
                     </StackPanel>
 
                 </ListBox>

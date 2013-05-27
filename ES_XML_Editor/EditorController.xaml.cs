@@ -24,6 +24,9 @@ namespace ES_XML_Editor
         // Shortcut variable for quicker access to the .settings file
         private static ProgramSettings settings = ProgramSettings.Default;
 
+        // list that stores the contents of a file
+        private List<Object> dataList; 
+
         // String to hold the directory for program files on the users computer
         String ProgramFolder;
 
@@ -60,7 +63,56 @@ namespace ES_XML_Editor
             
         }
 
-        public void openFileChooser()
+        #region publicFunctions
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        public void openFile(out String fileName)
+        {
+            fileName = openFileChooser();
+
+            FileHandler someFile = new FileHandler(fileName);
+            dataList = someFile.open();
+
+        }
+
+        //public void openFile()
+        //{
+        //    String fileName = openFileChooser();
+
+        //    FileHandler someFile = new FileHandler(fileName);
+        //    dataList = someFile.open();
+
+        //}
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        public void showErrorMessage(String messageOfDoom)
+        {
+            MessageBox.Show(this, messageOfDoom, "Error!", MessageBoxButton.OK);
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        public void closeProgram()
+        {
+            try
+            {
+                this.Close();
+            }
+            catch (InvalidOperationException)
+            {
+                showErrorMessage("Invalid operation exception caught in function EditorController.closeProgram().");
+            }
+        }
+
+        #endregion
+
+        #region protectedFunctions
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        protected String openFileChooser()
         {
             OpenFileDialog fileChooser = new OpenFileDialog();
 
@@ -70,13 +122,15 @@ namespace ES_XML_Editor
 
             if (fileChooser.ShowDialog(this) == true)
             {
-                ;
+                return fileChooser.FileName;
             }
+            return null;
         }
 
-        
 
-        public void retrieveSettingsFile(String filePath)
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        protected void retrieveSettingsFile(String filePath)
         {
             try
             {
@@ -87,6 +141,8 @@ namespace ES_XML_Editor
                 settingsFile= new KeyValuePairDataBase();
             }
         }
+
+        #endregion
 
         //public String findSetting(EditorSettings setting)
         //{
@@ -106,22 +162,6 @@ namespace ES_XML_Editor
         //    settingsFile.setKeyValuePair(setting.ToString(), settingValue);
         //}
 
-        public void showErrorMessage(String messageOfDoom)
-        {
-            MessageBox.Show(this, messageOfDoom,"Error!", MessageBoxButton.OK);
-        }
-
-        public void closeProgram()
-        {
-            try
-            {
-                this.Close();
-            }
-            catch (InvalidOperationException)
-            {
-                showErrorMessage("Invalid operation exception caught in function EditorController.closeProgram().");
-            }
-        }
 
     }
 
@@ -134,6 +174,129 @@ namespace ES_XML_Editor
 
     public class FileHandler
     {
+        // Shortcut variable for quicker access to the .settings file
+        private static ProgramSettings settings = ProgramSettings.Default;
+
+        private String handledFile;
+
+        private String ext;
+
+        public FileHandler()
+        {
+            handledFile= null;
+        }
+
+        public FileHandler(String tempFileName)
+        {
+            handledFile= tempFileName;
+        }
+
+        public String fileName
+        {
+            set
+            {
+                handledFile = value;
+            }
+            get
+            {
+                return handledFile;
+            }
+        }
+
+        public List<Object> open()
+        {
+            ;
+            return null;
+        }
+
+        public List<Object> open(String tempFileName)
+        {
+            handledFile = tempFileName;
+            return open();
+        }
+
+        private List<Object> parseXml()
+        {
+            List<Object> returningList=null;
+
+            try
+            {
+                //load xml file as a single element representing the root node
+                XElement xmlRootNode = XDocument.Load(handledFile).Element(settings.xmlRootElementName);
+
+                // An object to enumerate over the XML nodes
+                IEnumerable<XElement> xmlElements = (from c in xmlRootNode.Elements() select c);
+
+                switch (handledFile)
+                {
+                    case "WeaponModule.xml":
+                        //zztoWeaponModule(out returningList, xmlElements);
+                        //return returningList;
+
+                        break;
+
+                        
+                }
+                return returningList;
+
+            }
+            catch
+            {
+                return null;
+            }
+            //return null;
+        }
+
+        private void toWeaponModule(List<Object> workingList, IEnumerable<XElement> nodes)
+        {
+            ;
+        }
+
+
+        private void zztoWeaponModule(out List<Object> workingList, IEnumerable<XElement> nodes)
+        {
+            workingList=null;
+
+            zzWeaponModule someModule;
+
+            foreach (XElement elementNode in nodes)
+            {
+                someModule = new zzWeaponModule();
+                someModule.name = elementNode.Attribute("Name").Value;
+                someModule.cost = elementNode.Attribute("Cost").Value;
+                someModule.weight = elementNode.Attribute("Weight").Value;
+                someModule.militaryPower = elementNode.Attribute("MilitaryPower").Value;
+
+                XElement childElement = elementNode.Element("Simulation");
+
+                someModule.damageMin = childElement.Attribute("DamageMin").Value;
+                someModule.damageMax = childElement.Attribute("DamageMax").Value;
+                someModule.criticMultiplier = childElement.Attribute("CriticMultiplier").Value;
+                someModule.criticChance = childElement.Attribute("CriticChance").Value;
+                someModule.interceptionEvasion = childElement.Attribute("InterceptionEvasion").Value;
+                someModule.numberPerSalve = childElement.Attribute("NumberPerSalve").Value;
+                someModule.turnBeforeReach = childElement.Attribute("TurnBeforeReach").Value;
+                someModule.turnToReload = childElement.Attribute("TurnToReload").Value;
+                someModule.weaponClass = childElement.Element("WeaponClass").Value;
+
+                childElement = elementNode.Element("Reflection");
+
+                someModule.speed = childElement.Attribute("Speed").Value;
+                someModule.priority = childElement.Attribute("Priority").Value;
+                someModule.boardSideMaxDuration = childElement.Attribute("BoardSideMaxDuration").Value;
+                someModule.boardSideFireDelay = childElement.Attribute("BoardSideFireDelay").Value;
+                someModule.projectilesPrefabs = childElement.Element("Projectiles-Prefabs").Element("Prefab").Attribute("Path").Value;
+
+                childElement = elementNode.Element("Gui");
+
+                someModule.title = childElement.Element("Title").Value;
+                someModule.description = childElement.Element("Description").Value;
+                someModule.icon = childElement.Element("Icon").Attribute("Small").Value;
+                //UNFINISHED CLASS! MISSING  ICON ATTRIBUTE "LARGE"
+                someModule.charCode = childElement.Element("CharCode").Value;
+
+            }
+        }
     }
 
 

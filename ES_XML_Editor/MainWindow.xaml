@@ -6,8 +6,10 @@
     		<RowDefinition Height="11*"/>
     		<RowDefinition Height="149*"/>
     	</Grid.RowDefinitions>
-    	<ListBox Grid.Row="1" Background="#FFD1D1D1"/>
-    	<StackPanel Background="#FFC1C1C1">
+        <ListBox Grid.Row="1" Background="#FFD1D1D1">
+            <ItemsControl ItemsSource="{Binding}"/>
+        </ListBox>
+            <StackPanel Background="#FFC1C1C1">
     		<Button Content="Open File" HorizontalAlignment="Left" Click="openFileButtonClick"/>
     	</StackPanel>
     </Grid>
