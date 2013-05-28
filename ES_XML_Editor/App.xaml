@@ -5,23 +5,141 @@
              StartupUri="EditorController.xaml" ShutdownMode="OnMainWindowClose">
     <Application.Resources>
         <DataTemplate DataType="WeaponModule">
-        	<Grid Height="136.5" Width="241">
-        		<ListBox HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Top" Width="Auto" SelectionMode="Extended" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel IsItemsHost="True"/>
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Horizontal">
-                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Name: " VerticalAlignment="Center"/>
-                        <!--
-                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                        -->
-                        <TextBox x:Name="textBox" HorizontalAlignment="Left" Text="{Binding Path=Attribute[Name].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Visibility="Collapsed"/>
-                    </StackPanel>
 
-                </ListBox>
-            </Grid>
+            <GroupBox Margin="0,10,0,0">
+                <GroupBox.Header>
+                    <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal">
+                        <CheckBox Content="Name: " VerticalAlignment="Center"/>
+                        <TextBox HorizontalAlignment="Left" Text="{Binding Attribute[Name].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    </StackPanel>
+                </GroupBox.Header>
+                <WrapPanel>
+                    <GroupBox Header="WeaponModule" VerticalAlignment="Top">
+                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Vertical">
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="Cost: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Attribute[Cost].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="Weight: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Attribute[Weight].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="Military Power: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Attribute[MilitaryPower].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Header="Simulation" VerticalAlignment="Top" Height="140">
+                        <WrapPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Vertical">
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="DamageMin: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Simulation].Attribute[DamageMin].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="DamageMax: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Simulation].Attribute[DamageMax].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="CriticMultiplier: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Simulation].Attribute[CriticMultiplier].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="CriticChance: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Simulation].Attribute[CriticChance].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="InterceptionEvasion: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Simulation].Attribute[InterceptionEvasion].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="NumberPerSalve: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Simulation].Attribute[NumberPerSalve].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="Accuracy: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Simulation].Attribute[Accuracy].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="TurnBeforeReach: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Simulation].Attribute[TurnBeforeReach].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="TurnToReload: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Simulation].Attribute[TurnToReload].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="WeaponClass: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Simulation].Element[WeaponClass].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                        </WrapPanel>
+                    </GroupBox>
+                    <GroupBox Header="Reflection" VerticalAlignment="Top">
+                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Vertical">
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="Speed: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Reflection].Attribute[Speed].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="Priority: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Reflection].Attribute[Priority].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="BoardSideMaxDuration: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Reflection].Attribute[BoardSideMaxDuration].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="BoardSideFireDelay: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Reflection].Attribute[BoardSideFireDelay].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="Projectiles-Prefabs: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Reflection].Element[Projectiles-Prefabs].Element[Prefab].Attribute[Path].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Header="Gui" VerticalAlignment="Top">
+                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Vertical">
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="Title: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Gui].Element[Title].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="Description: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Gui].Element[Description].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="Icon: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Gui].Element[Icon].Attribute[Small].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
+                                <CheckBox Content="CharCode: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Gui].Element[CharCode].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                </WrapPanel>
+            </GroupBox>
+
+
+            <!--
+            <ListBox HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Top" Width="Auto" SelectionMode="Extended" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel IsItemsHost="True"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                
+                    
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Horizontal">
+                    <CheckBox Content="Name: " VerticalAlignment="Center"/>
+                    <TextBox HorizontalAlignment="Left" Text="{Binding Attribute[Name].Value}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                </StackPanel>
+                    
+                
+            </ListBox>
+            -->
+                
         </DataTemplate>
     </Application.Resources>
 </Application>

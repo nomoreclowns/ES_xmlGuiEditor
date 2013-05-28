@@ -12,6 +12,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using Microsoft.Win32;
 using System.Timers;
+using System.Windows.Controls;
 
 
 namespace ES_XML_Editor
@@ -25,7 +26,15 @@ namespace ES_XML_Editor
         private static ProgramSettings settings = ProgramSettings.Default;
 
         // list that stores the contents of a file
-        private List<Object> dataList; 
+        private IEnumerable<XElement> dataList;
+
+        public IEnumerable<XElement> bindableList
+        {
+            get
+            {
+                return null;
+            }
+        }
 
         // String to hold the directory for program files on the users computer
         String ProgramFolder;
@@ -38,7 +47,8 @@ namespace ES_XML_Editor
         private String directoryLastUsed;
 
         //instance of the base window
-        MainWindow baseWindowObject;
+        private MainWindow baseWindowObject;
+
 
         //default constructor
         public EditorController()
@@ -69,12 +79,14 @@ namespace ES_XML_Editor
          *************************************************************************************************************************/
         public void openFile(out String fileName)
         {
-            OpenFileDialog someFileDialog;
+            OpenFileDialog someFileChooser;
 
-            fileName = openFileChooser( out someFileDialog);
+            fileName = openFileChooser( out someFileChooser);
 
-            FileHandler someFile = new FileHandler(fileName);
+            FileHandler someFile = new FileHandler(someFileChooser.FileName);
             dataList = someFile.open();
+
+            
 
         }
 
@@ -86,6 +98,22 @@ namespace ES_XML_Editor
         //    dataList = someFile.open();
 
         //}
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        public void bindFunction(ref ListBox guiListBox)
+        {
+            try
+            {
+                //guiListBox.ItemTemplate = (DataTemplate)FindResource("WeaponModule");
+                //guiListBox.DataContext = dataList;
+                guiListBox.ItemsSource = dataList;
+            }
+            catch
+            {
+                showErrorMessage("Could not bind to xml");
+            }
+        }
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
@@ -125,7 +153,7 @@ namespace ES_XML_Editor
             if (fileChooser.ShowDialog(this) == true)
             {
                 //showErrorMessage(fileChooser.SafeFileName);
-                return fileChooser.FileName;
+                return fileChooser.SafeFileName;
             }
             return null;
         }

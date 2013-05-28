@@ -50,6 +50,23 @@ namespace ES_XML_Editor
             String theFile;
 
             controllerReference.openFile(out theFile);
+
+            controllerReference.bindFunction(ref windowListbox);
+
+            itemCountLabel.Text = windowListbox.Items.Count.ToString();
+        }
+
+        private void windowListBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                selectedCountLabel.Text = windowListbox.SelectedItems.Count.ToString();
+                itemCountLabel.Text = windowListbox.Items.Count.ToString();
+            }
+            catch
+            {
+                selectedCountLabel.Text = "0";
+            }
         }
 
     }

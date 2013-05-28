@@ -1,16 +1,27 @@
 ﻿<Window x:Class="ES_XML_Editor.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Height="350" Width="525" WindowStyle="ThreeDBorderWindow" Closing="closingWindow" WindowStartupLocation="CenterScreen" ShowInTaskbar="False">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Height="350" Width="525" WindowStyle="ThreeDBorderWindow" Closing="closingWindow" WindowStartupLocation="CenterScreen" ShowInTaskbar="False" ScrollViewer.CanContentScroll="True">
     <Grid>
     	<Grid.RowDefinitions>
-    		<RowDefinition Height="11*"/>
+    		<RowDefinition Height="Auto"/>
     		<RowDefinition Height="149*"/>
     	</Grid.RowDefinitions>
-        <ListBox Grid.Row="1" Background="#FFD1D1D1">
+        <ListBox x:Name="windowListbox" Grid.Row="1" Background="#FFD1D1D1" SelectionChanged="windowListBoxSelectionChanged" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Padding="5,0,10,0" ScrollViewer.CanContentScroll="False">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel IsItemsHost="True"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <!--
             <ItemsControl ItemsSource="{Binding}"/>
+            -->
         </ListBox>
-            <StackPanel Background="#FFC1C1C1">
+            <StackPanel Background="#FFC1C1C1" Orientation="Horizontal">
     		<Button Content="Open File" HorizontalAlignment="Left" Click="openFileButtonClick"/>
-    	</StackPanel>
+            <TextBlock TextWrapping="Wrap" Text="number of items in list: " HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <TextBlock x:Name="itemCountLabel" TextWrapping="Wrap" Text="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,3.02,0,2.98"/>
+            <TextBlock TextWrapping="Wrap" Text="selected items in list: " HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <TextBlock x:Name="selectedCountLabel" TextWrapping="Wrap" Text="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,3.02,0,2.98"/>
+        </StackPanel>
     </Grid>
 </Window>
