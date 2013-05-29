@@ -6,22 +6,21 @@
     		<RowDefinition Height="Auto"/>
     		<RowDefinition Height="149*"/>
     	</Grid.RowDefinitions>
-        <ListBox x:Name="windowListbox" Grid.Row="1" Background="#FFD1D1D1" SelectionChanged="windowListBoxSelectionChanged" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Padding="5,0,10,0" ScrollViewer.CanContentScroll="False">
+        <ListBox x:Name="windowListbox" Grid.Row="1" Background="#FFE6E6E6" SelectionChanged="windowListBoxSelectionChanged" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Padding="5,0,10,0" ScrollViewer.CanContentScroll="False" SourceUpdated="listBoxSourceUpdatedHandler">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel IsItemsHost="True"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
-            <!--
-            <ItemsControl ItemsSource="{Binding}"/>
-            -->
         </ListBox>
             <StackPanel Background="#FFC1C1C1" Orientation="Horizontal">
     		<Button Content="Open File" HorizontalAlignment="Left" Click="openFileButtonClick"/>
-            <TextBlock TextWrapping="Wrap" Text="number of items in list: " HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <TextBlock x:Name="itemCountLabel" TextWrapping="Wrap" Text="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,3.02,0,2.98"/>
-            <TextBlock TextWrapping="Wrap" Text="selected items in list: " HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <TextBlock x:Name="selectedCountLabel" TextWrapping="Wrap" Text="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,3.02,0,2.98"/>
+                
+            <TextBlock TextWrapping="Wrap" Text="Current File: " HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <TextBlock x:Name="currentFileLabel" TextWrapping="Wrap" Text="none" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,3.02,0,2.98"/>
+            <TextBlock TextWrapping="Wrap" Text="Full File Path: " HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <TextBlock x:Name="currentFileFullPathLabel" TextWrapping="Wrap" Text="none" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,3.02,0,2.98"/>
+                
         </StackPanel>
     </Grid>
 </Window>

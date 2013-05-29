@@ -49,25 +49,37 @@ namespace ES_XML_Editor
         {
             String theFile;
 
-            controllerReference.openFile(out theFile);
+            String fullPath;
+
+            controllerReference.openFile(out theFile, out fullPath);
 
             controllerReference.bindFunction(ref windowListbox);
 
-            itemCountLabel.Text = windowListbox.Items.Count.ToString();
+            currentFileLabel.Text = theFile;
+            currentFileFullPathLabel.Text = fullPath;
         }
 
         private void windowListBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            try
-            {
-                selectedCountLabel.Text = windowListbox.SelectedItems.Count.ToString();
-                itemCountLabel.Text = windowListbox.Items.Count.ToString();
-            }
-            catch
-            {
-                selectedCountLabel.Text = "0";
-            }
+            //try
+            //{
+            //    //selectedCountLabel.Text = windowListbox.SelectedItems.Count.ToString();
+            //    currentFileLabel.Text =;
+            //}
+            //catch
+            //{
+            //    currentFileLabel.Text = "none";
+            //}
         }
 
+        private void listBoxSourceUpdatedHandler(object sender, DataTransferEventArgs e)
+        {
+            controllerReference.saveData();
+        }
+
+        public String currentFile()
+        {
+            return currentFileFullPathLabel.Text;
+        }
     }
 }

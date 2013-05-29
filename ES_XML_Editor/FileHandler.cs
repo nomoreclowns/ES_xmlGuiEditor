@@ -28,7 +28,7 @@ namespace ES_XML_Editor
             }
         }
 
-        public IEnumerable<XElement> open()
+        public XElement open()
         {
             try
             {
@@ -38,7 +38,7 @@ namespace ES_XML_Editor
                 // An object to enumerate over the XML nodes
                 IEnumerable<XElement> xmlElements = (from c in xmlRootNode.Elements() select c);
 
-                return xmlElements;
+                return xmlRootNode;
 
             }
             catch
@@ -47,7 +47,7 @@ namespace ES_XML_Editor
             }
         }
 
-        public IEnumerable<XElement> open(String tempFileName)
+        public XElement open(String tempFileName)
         {
             handledFilePath = tempFileName;
             return open();

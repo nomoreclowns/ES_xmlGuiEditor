@@ -26,7 +26,7 @@ namespace ES_XML_Editor
         private static ProgramSettings settings = ProgramSettings.Default;
 
         // list that stores the contents of a file
-        private IEnumerable<XElement> dataList;
+        private XElement dataList;
 
         public IEnumerable<XElement> bindableList
         {
@@ -57,36 +57,32 @@ namespace ES_XML_Editor
 
             ProgramFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), settings.progName);
 
-            String settingsPath = System.IO.Path.Combine(ProgramFolder, "settings.xml");
-
-            retrieveSettingsFile(settingsPath);
+            retrieveSettingsFile(ProgramFolder);
 
             directoryLastUsed = settingsFile.getValue(EditorSettings.lastUsedDirectory.ToString());
 
-            if (directoryLastUsed == null)
+            
+            if (Directory.Exists(directoryLastUsed) == false)
             {
-                directoryLastUsed= Environment.GetFolderPath(Environment.SpecialFolder.MyComputer);
+                directoryLastUsed= Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             }
 
             baseWindowObject = new MainWindow(this);
             baseWindowObject.Show();
-            
         }
 
         #region publicFunctions
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        public void openFile(out String fileName)
+        public void openFile(out String fileName, out String fullFilePath)
         {
             OpenFileDialog someFileChooser;
 
-            fileName = openFileChooser( out someFileChooser);
-
+            fileName = openFileChooser(out someFileChooser, out fullFilePath);
+            
             FileHandler someFile = new FileHandler(someFileChooser.FileName);
             dataList = someFile.open();
-
-            
 
         }
 
@@ -107,7 +103,7 @@ namespace ES_XML_Editor
             {
                 //guiListBox.ItemTemplate = (DataTemplate)FindResource("WeaponModule");
                 //guiListBox.DataContext = dataList;
-                guiListBox.ItemsSource = dataList;
+                guiListBox.ItemsSource = dataList.Elements();
             }
             catch
             {
@@ -124,10 +120,17 @@ namespace ES_XML_Editor
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
+        public void saveData()
+        {
+            dataList.Save(baseWindowObject.currentFile());
+        }
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
         public void closeProgram()
         {
             try
             {
+                saveData();
                 this.Close();
             }
             catch (InvalidOperationException)
@@ -142,30 +145,52 @@ namespace ES_XML_Editor
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        protected String openFileChooser(out OpenFileDialog fileChooser)
+        protected String openFileChooser(out OpenFileDialog fileChooser, out String fullPath)
         {
             fileChooser = new OpenFileDialog();
 
             fileChooser.Multiselect = false;
             fileChooser.Filter = "XML|*.xml;";
-            fileChooser.InitialDirectory = @directoryLastUsed;
+            fileChooser.InitialDirectory = directoryLastUsed;
 
             if (fileChooser.ShowDialog(this) == true)
             {
-                //showErrorMessage(fileChooser.SafeFileName);
+                fullPath = fileChooser.FileName;
+                directoryLastUsed = fileChooser.FileName.TrimEnd(fileChooser.SafeFileName.ToCharArray());
+                //showErrorMessage(directoryLastUsed);
+                settingsFile.setKeyValuePair(EditorSettings.lastUsedDirectory.ToString(), directoryLastUsed);
+                saveSettings();
                 return fileChooser.SafeFileName;
             }
-            return null;
+            return fullPath=null;
         }
-
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        protected void retrieveSettingsFile(String filePath)
+        protected void saveSettings()
         {
+            String settingsPath = System.IO.Path.Combine(ProgramFolder, "settings.xml");
             try
             {
-                settingsFile = new KeyValuePairDataBase(filePath);
+                settingsFile.saveToFile(settingsPath);
+            }
+            catch
+            {
+
+                Directory.CreateDirectory(ProgramFolder);
+                settingsFile = new KeyValuePairDataBase();
+                settingsFile.saveToFile(settingsPath);
+            }
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        protected void retrieveSettingsFile(String folderPath)
+        {
+            String settingsPath = System.IO.Path.Combine(ProgramFolder, "settings.xml");
+            try
+            {
+                settingsFile = new KeyValuePairDataBase(settingsPath);
             }
             catch
             {
