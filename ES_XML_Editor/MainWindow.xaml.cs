@@ -20,27 +20,43 @@ namespace ES_XML_Editor
     /// </summary>
     public partial class MainWindow : Window
     {
-        EditorController controllerReference;
+        private controllerOpenFile contFileOpener;
+        private controllerBind contBinder;
+        private controllerShowError contErrorDisplayer;
+        private controllerSave contFileSaver;
+        private controllerClose contProgramCloser;
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        public MainWindow(EditorController owner)
+        //public MainWindow(EditorController owner)
+        //{
+        //    InitializeComponent();
+
+        //    if (owner == null)
+        //    {
+        //        throw new NullReferenceException("MainWindow Constructor cannot have a null reference to program controller");
+        //    }
+        //    controllerReference = owner;
+
+        //}
+
+        public MainWindow(controllerDelegateContainer editorFunctions)
         {
             InitializeComponent();
 
-            if (owner == null)
+            if (editorFunctions == null)
             {
-                throw new NullReferenceException("MainWindow Constructor cannot have a null reference to program controller");
+                throw new NullReferenceException("MainWindow Constructor cannot have a null reference to editorFunctions");
             }
-            controllerReference = owner;
-            
+            editorFunctions.retrieveDelegates(out contErrorDisplayer, out contFileOpener, out contBinder, out contFileSaver, out contProgramCloser);
+
         }
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
         private void closingWindow(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            controllerReference.closeProgram();
+            contProgramCloser();
         }
 
         /* ************************************************************************************************************************
@@ -51,9 +67,9 @@ namespace ES_XML_Editor
 
             String fullPath;
 
-            controllerReference.openFile(out theFile, out fullPath);
-
-            controllerReference.bindFunction(ref windowListbox);
+            contFileOpener(out theFile, out fullPath);
+            
+            contBinder(ref windowListbox);
 
             currentFileLabel.Text = theFile;
             currentFileFullPathLabel.Text = fullPath;
@@ -74,7 +90,8 @@ namespace ES_XML_Editor
 
         private void listBoxSourceUpdatedHandler(object sender, DataTransferEventArgs e)
         {
-            controllerReference.saveData();
+            //controllerReference.saveData();
+            contFileSaver();
         }
 
         public String currentFile()

@@ -27,13 +27,16 @@ namespace ES_XML_Editor
 
     public delegate void controllerClose();
 
-    public class delegateContainer
+    public delegate void controllerErrorCallback();
+
+    public class controllerDelegateContainer
     {
         private controllerOpenFile pFileOpener;
         private controllerBind pBinder;
         private controllerShowError pErrorDisplayer;
         private controllerSave pFileSaver;
         private controllerClose pProgramCloser;
+        private controllerErrorCallback pAccessViolationInformer;
 
         public controllerOpenFile fileOpener
         {
@@ -59,6 +62,14 @@ namespace ES_XML_Editor
             }
         }
 
+        public controllerErrorCallback accessViolationInformer
+        {
+            get
+            {
+                return pAccessViolationInformer;
+            }
+        }
+
         public controllerSave fileSaver
         {
             get
@@ -75,13 +86,14 @@ namespace ES_XML_Editor
             }
         }
 
-        public delegateContainer(controllerShowError iErrorDisplayer, controllerOpenFile iFileOpener = null, controllerBind iBinder = null, controllerSave iFileSaver = null, controllerClose iProgramCloser = null)
+        public controllerDelegateContainer(controllerShowError iErrorDisplayer, controllerErrorCallback iAccessViolationInformer, controllerOpenFile iFileOpener = null, controllerBind iBinder = null, controllerSave iFileSaver = null, controllerClose iProgramCloser = null)
         {
             pErrorDisplayer = iErrorDisplayer;
             pFileOpener = iFileOpener;
             pBinder = iBinder;
             pFileSaver = iFileSaver;
             pProgramCloser = iProgramCloser;
+            pAccessViolationInformer = iAccessViolationInformer;
         }
 
         public void unauthorizedAccess()
@@ -89,9 +101,13 @@ namespace ES_XML_Editor
             ;
         }
 
-        public void retrieveDelegates()
+        public void retrieveDelegates(out controllerShowError iErrorDisplayer, out controllerOpenFile iFileOpener, out controllerBind iBinder, out controllerSave iFileSaver, out controllerClose iProgramCloser)
         {
-            ;
+            iErrorDisplayer = pErrorDisplayer;
+            iFileOpener = pFileOpener;
+            iBinder = pBinder;
+            iFileSaver = pFileSaver;
+            iProgramCloser = pProgramCloser;
         }
 
     }
@@ -147,7 +163,7 @@ namespace ES_XML_Editor
                 directoryLastUsed= Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             }
 
-            baseWindowObject = new MainWindow(this);
+            baseWindowObject = new MainWindow(new controllerDelegateContainer(showErrorMessage, delegateContainerErrorFunction, openFile, bindFunction, saveData, closeProgram));
             baseWindowObject.Show();
         }
 
@@ -182,7 +198,7 @@ namespace ES_XML_Editor
             try
             {
                 //guiListBox.ItemTemplate = (DataTemplate)FindResource("WeaponModule");
-                //guiListBox.DataContext = dataList;
+                //guiListBox.DataContext = dataList.Elements();
                 guiListBox.ItemsSource = dataList.Elements();
             }
             catch
@@ -202,7 +218,12 @@ namespace ES_XML_Editor
          *************************************************************************************************************************/
         public void saveData()
         {
-            dataList.Save(baseWindowObject.currentFile());
+            String fileName= baseWindowObject.currentFile();
+            if (File.Exists(fileName))
+            {
+                dataList.Save(fileName);
+            }
+            
         }
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
@@ -218,6 +239,12 @@ namespace ES_XML_Editor
                 showErrorMessage("Invalid operation exception caught in function EditorController.closeProgram().");
             }
         }
+
+        public void delegateContainerErrorFunction()
+        {
+            ;
+        }
+
 
         #endregion
 
