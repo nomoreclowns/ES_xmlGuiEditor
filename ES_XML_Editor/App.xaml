@@ -224,12 +224,12 @@
                                 <TextBox HorizontalAlignment="Left" Text="{Binding Attribute[X].Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
                             </StackPanel>
                             <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
-                                <CheckBox Content="AffinityMapping: " VerticalAlignment="Center"/>
-                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[AffinityMapping].Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                                <CheckBox Content="Y: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Y].Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
                             </StackPanel>
                             <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Margin="5,0,0,0">
-                                <CheckBox Content="Traits: " VerticalAlignment="Center"/>
-                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Traits].Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                                <CheckBox Content="Category: " VerticalAlignment="Center"/>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Element[Category].Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
                             </StackPanel>
                         </WrapPanel>
                     </GroupBox>

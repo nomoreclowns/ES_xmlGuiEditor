@@ -17,6 +17,86 @@ using System.Windows.Controls;
 
 namespace ES_XML_Editor
 {
+    public delegate void controllerOpenFile(out String delFileName, out String delFullFilePath);
+
+    public delegate void controllerBind(ref ListBox delListBox);
+
+    public delegate void controllerShowError(String delMessageOfDoom);
+
+    public delegate void controllerSave();
+
+    public delegate void controllerClose();
+
+    public class delegateContainer
+    {
+        private controllerOpenFile pFileOpener;
+        private controllerBind pBinder;
+        private controllerShowError pErrorDisplayer;
+        private controllerSave pFileSaver;
+        private controllerClose pProgramCloser;
+
+        public controllerOpenFile fileOpener
+        {
+            get
+            {
+                return pFileOpener;
+            }
+        }
+
+        public controllerBind binder
+        {
+            get
+            {
+                return pBinder;
+            }
+        }
+
+        public controllerShowError errorDisplayer
+        {
+            get
+            {
+                return pErrorDisplayer;
+            }
+        }
+
+        public controllerSave fileSaver
+        {
+            get
+            {
+                return pFileSaver;
+            }
+        }
+
+        public controllerClose programCloser
+        {
+            get
+            {
+                return pProgramCloser;
+            }
+        }
+
+        public delegateContainer(controllerShowError iErrorDisplayer, controllerOpenFile iFileOpener = null, controllerBind iBinder = null, controllerSave iFileSaver = null, controllerClose iProgramCloser = null)
+        {
+            pErrorDisplayer = iErrorDisplayer;
+            pFileOpener = iFileOpener;
+            pBinder = iBinder;
+            pFileSaver = iFileSaver;
+            pProgramCloser = iProgramCloser;
+        }
+
+        public void unauthorizedAccess()
+        {
+            ;
+        }
+
+        public void retrieveDelegates()
+        {
+            ;
+        }
+
+    }
+
+
     /// <summary>
     /// Interaction logic for EditorController.xaml
     /// </summary>
