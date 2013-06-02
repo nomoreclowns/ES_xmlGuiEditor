@@ -19,7 +19,7 @@ namespace ES_XML_Editor
 {
     public delegate void controllerOpenFile(out String delFileName, out String delFullFilePath);
 
-    public delegate void controllerBind(ref ListBox delListBox);
+    public delegate void controllerBind(ref ListBox delListBox, ref ScrollViewer delDetailBox);
 
     public delegate void controllerShowError(String delMessageOfDoom);
 
@@ -123,14 +123,17 @@ namespace ES_XML_Editor
 
         // list that stores the contents of a file
         private XElement dataList;
+        private xmlElement dataList2;
 
-        public IEnumerable<XElement> bindableList
-        {
-            get
-            {
-                return null;
-            }
-        }
+        private CollectionView dataListView;
+
+        //public IEnumerable<XElement> bindableList
+        //{
+        //    get
+        //    {
+        //        return null;
+        //    }
+        //}
 
         // String to hold the directory for program files on the users computer
         String ProgramFolder;
@@ -178,8 +181,9 @@ namespace ES_XML_Editor
             fileName = openFileChooser(out someFileChooser, out fullFilePath);
             
             FileHandler someFile = new FileHandler(someFileChooser.FileName);
-            dataList = someFile.open();
-
+            //dataList = someFile.open();
+            dataList2 = new xmlElement(someFile.open());
+            dataListView = (CollectionView)CollectionViewSource.GetDefaultView(dataList2.allXmlElements);
         }
 
         //public void openFile()
@@ -193,13 +197,32 @@ namespace ES_XML_Editor
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        public void bindFunction(ref ListBox guiListBox)
+        //public void bindFunction(ref ListBox guiListBox)
+        //{
+        //    try
+        //    {
+        //        //guiListBox.ItemTemplate = (DataTemplate)FindResource("WeaponModule");
+        //        //guiListBox.DataContext = dataList.Elements();
+        //        guiListBox.ItemsSource = dataListView;
+
+        //    }
+        //    catch
+        //    {
+        //        showErrorMessage("Could not bind to xml");
+        //    }
+        //}
+
+        public void bindFunction(ref ListBox guiListBox, ref ScrollViewer detailBox)
         {
             try
             {
                 //guiListBox.ItemTemplate = (DataTemplate)FindResource("WeaponModule");
                 //guiListBox.DataContext = dataList.Elements();
-                guiListBox.ItemsSource = dataList.Elements();
+
+
+                guiListBox.ItemsSource = dataListView;
+                detailBox.Content = dataListView.CurrentItem;
+                
             }
             catch
             {
@@ -221,7 +244,7 @@ namespace ES_XML_Editor
             String fileName= baseWindowObject.currentFile();
             if (File.Exists(fileName))
             {
-                dataList.Save(fileName);
+                dataList2.Save(fileName);
             }
             
         }
@@ -338,4 +361,250 @@ namespace ES_XML_Editor
     {
         lastUsedDirectory
     }
+
+
+    public class xmlAttribute : XAttribute
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(String name)
+        {
+            PropertyChangedEventHandler changedHandler = PropertyChanged;
+
+            if (changedHandler != null)
+            {
+                changedHandler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+        public XName AttributeName
+        {
+            get
+            {
+                return this.Name;
+            }
+        }
+
+        public String AttributeValue
+        {
+            set
+            {
+                this.Value = value;
+                OnPropertyChanged("AttributeValue");
+            }
+            get
+            {
+                return this.Value;
+            }
+        }
+
+        public xmlAttribute(XAttribute otherAttr) : base(otherAttr) { }
+    }
+
+    public class SingleElement : XElement
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(String name)
+        {
+            PropertyChangedEventHandler changedHandler = PropertyChanged;
+
+            if (changedHandler != null)
+            {
+                changedHandler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+        public XName ElementName
+        {
+            get
+            {
+                return this.Name;
+            }
+        }
+
+        public String ElementValue
+        {
+            set
+            {
+                this.Value = value;
+                OnPropertyChanged("ElementValue");
+            }
+            get
+            {
+                return this.Value;
+            }
+        }
+
+        public ObservableCollection<xmlAttribute> xmlAttributes
+        {
+            get
+            {
+                ObservableCollection<xmlAttribute> returnable = new ObservableCollection<xmlAttribute>();
+                foreach (XAttribute item in Attributes())
+                {
+                    returnable.Add(new xmlAttribute(item));
+                }
+                return returnable;
+            }
+        }
+
+        public SingleElement(XElement otherElem) : base(otherElem) { }
+
+        public SingleElement(String xmlName) : base(xmlName) { }
+    }
+
+    public class AttributesElement : XElement
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(String name)
+        {
+            PropertyChangedEventHandler changedHandler = PropertyChanged;
+
+            if (changedHandler != null)
+            {
+                changedHandler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+        public XName ElementName
+        {
+            get
+            {
+                return this.Name;
+            }
+        }
+
+        public String ElementValue
+        {
+            set
+            {
+                this.Value = value;
+                OnPropertyChanged("ElementValue");
+            }
+            get
+            {
+                return this.Value;
+            }
+        }
+
+        public ObservableCollection<xmlAttribute> xmlAttributes
+        {
+            get
+            {
+                ObservableCollection<xmlAttribute> returnable = new ObservableCollection<xmlAttribute>();
+                foreach (XAttribute item in Attributes())
+                {
+                    returnable.Add(new xmlAttribute(item));
+                }
+                return returnable;
+            }
+        }
+
+        public AttributesElement(XElement otherElem) : base(otherElem) { }
+
+        public AttributesElement(String xmlName) : base(xmlName) { }
+    }
+
+    public class xmlElement : XElement
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(String name)
+        {
+            PropertyChangedEventHandler changedHandler = PropertyChanged;
+
+            if (changedHandler != null)
+            {
+                changedHandler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+        public XName ElementName
+        {
+            get
+            {
+                return this.Name;
+            }
+        }
+
+        public String ElementValue
+        {
+            set
+            {
+                this.Value = value;
+                OnPropertyChanged("ElementValue");
+            }
+            get
+            {
+                return this.Value;
+            }
+        }
+
+        public ObservableCollection<xmlAttribute> xmlAttributes
+        {
+            get
+            {
+                ObservableCollection<xmlAttribute> returnable= new ObservableCollection<xmlAttribute>();
+                foreach (XAttribute item in Attributes())
+                {
+                    returnable.Add(new xmlAttribute(item));
+                }
+                return returnable;
+            }
+        }
+
+        public ObservableCollection<xmlElement> allXmlElements
+        {
+            get
+            {
+                ObservableCollection<xmlElement> returnable = new ObservableCollection<xmlElement>();
+                foreach (XElement item in Elements())
+                {
+                    returnable.Add(new xmlElement(item));
+                }
+                return returnable;
+            }
+        }
+
+        public ObservableCollection<xmlElement> procreatingXmlElements
+        {
+            get
+            {
+                
+                ObservableCollection<xmlElement> returnable = new ObservableCollection<xmlElement>();
+                foreach (XElement item in Elements())
+                {
+                    //List<XElement> temp= new List<XElement>(Elements());
+                    if (item.HasElements == true)
+                    {
+                        returnable.Add(new xmlElement(item));
+                    }
+                }
+                return returnable;
+            }
+        }
+
+        public ObservableCollection<SingleElement> lonelyXmlElements
+        {
+            get
+            {
+                ObservableCollection<SingleElement> returnable = new ObservableCollection<SingleElement>();
+                foreach (XElement item in Elements())
+                {
+                    if (item.HasElements == false)
+                    {
+                        returnable.Add(new SingleElement(item));
+                    }
+                }
+                return returnable;
+            }
+        }
+
+        public xmlElement(XElement otherElem) : base(otherElem) { }
+
+        public xmlElement(String xmlName) : base(xmlName) { }
+    }
+
 }

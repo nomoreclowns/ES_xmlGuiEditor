@@ -54,6 +54,28 @@ namespace ES_XML_Editor
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
+        private int[] listBoxSelectedItems
+        {
+            get
+            {
+                try
+                {
+                    int[] someArray = new int[windowListbox.SelectedItems.Count];
+                    for (int i = 0; i < windowListbox.SelectedItems.Count; i++)
+                    {
+                        someArray[i] = windowListbox.Items.IndexOf(windowListbox.SelectedItems[i]);
+                    }
+                    return someArray;
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
         private void closingWindow(object sender, System.ComponentModel.CancelEventArgs e)
         {
             contProgramCloser();
@@ -69,31 +91,41 @@ namespace ES_XML_Editor
 
             contFileOpener(out theFile, out fullPath);
             
-            contBinder(ref windowListbox);
+            contBinder(ref windowListbox, ref listBoxItemViewer);
 
-            currentFileLabel.Text = theFile;
+            //currentFileLabel.Text = theFile;
             currentFileFullPathLabel.Text = fullPath;
         }
 
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
         private void windowListBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //try
-            //{
-            //    //selectedCountLabel.Text = windowListbox.SelectedItems.Count.ToString();
-            //    currentFileLabel.Text =;
-            //}
-            //catch
-            //{
-            //    currentFileLabel.Text = "none";
-            //}
+            try
+            {
+                currentFileLabel.Text = "";
+                foreach (int index in listBoxSelectedItems)
+                {
+                    currentFileLabel.Text += index.ToString()+" ";
+                }
+                
+            }
+            catch
+            {
+                currentFileLabel.Text = "Error";
+            }
         }
 
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
         private void listBoxSourceUpdatedHandler(object sender, DataTransferEventArgs e)
         {
             //controllerReference.saveData();
             contFileSaver();
         }
 
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
         public String currentFile()
         {
             return currentFileFullPathLabel.Text;
