@@ -16,7 +16,7 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ListBox ItemTemplate="{StaticResource xmlListTemplate}" x:Name="windowListbox" Grid.Row="1" Background="#FFE6E6E6" SelectionChanged="windowListBoxSelectionChanged" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Padding="5,0,10,0" ScrollViewer.CanContentScroll="False" SourceUpdated="listBoxSourceUpdatedHandler" Grid.Column="1" IsSynchronizedWithCurrentItem="True" SelectionMode="Extended">
+        <ListBox ItemTemplate="{StaticResource xmlListItemTemplate}" x:Name="windowListbox" Grid.Row="1" Background="#FFE6E6E6" SelectionChanged="windowListBoxSelectionChanged" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Padding="5,0,10,0" ScrollViewer.CanContentScroll="False" SourceUpdated="listBoxSourceUpdatedHandler" Grid.Column="1" IsSynchronizedWithCurrentItem="True" SelectionMode="Extended">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel IsItemsHost="True"/>
@@ -33,7 +33,7 @@
             <TextBlock x:Name="currentFileFullPathLabel" TextWrapping="Wrap" Text="none" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,3.02,0,2.98"/>
 
         </StackPanel>
-        <ScrollViewer x:Name="listBoxItemViewer" Background="#FFE6E6E6" Grid.Column="1" Grid.Row="2" VerticalScrollBarVisibility="Auto" ContentTemplate="{StaticResource xmlItemTemplate}"/>
+        <ScrollViewer x:Name="listBoxItemViewer" Background="#FFE6E6E6" Grid.Column="1" Grid.Row="2" VerticalScrollBarVisibility="Auto" ContentTemplate="{StaticResource viewerTemplate}"/>
         <GridSplitter Grid.Row="1" Width="5"/>
         <GridSplitter Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Grid.Row="2" Grid.Column="1"/>
     </Grid>

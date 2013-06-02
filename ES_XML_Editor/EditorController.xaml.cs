@@ -183,7 +183,7 @@ namespace ES_XML_Editor
             FileHandler someFile = new FileHandler(someFileChooser.FileName);
             //dataList = someFile.open();
             dataList2 = new xmlElement(someFile.open());
-            dataListView = (CollectionView)CollectionViewSource.GetDefaultView(dataList2.allXmlElements);
+            dataListView = (CollectionView)CollectionViewSource.GetDefaultView(dataList2.xmlElements);
         }
 
         //public void openFile()
@@ -401,7 +401,7 @@ namespace ES_XML_Editor
         public xmlAttribute(XAttribute otherAttr) : base(otherAttr) { }
     }
 
-    public class SingleElement : XElement
+    public class DataElement : XElement
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -436,22 +436,79 @@ namespace ES_XML_Editor
             }
         }
 
-        public ObservableCollection<xmlAttribute> xmlAttributes
+        //public ObservableCollection<xmlAttribute> xmlAttributes
+        //{
+        //    get
+        //    {
+        //        ObservableCollection<xmlAttribute> returnable = new ObservableCollection<xmlAttribute>();
+        //        foreach (XAttribute item in Attributes())
+        //        {
+        //            returnable.Add(new xmlAttribute(item));
+        //        }
+        //        return returnable;
+        //    }
+        //}
+
+        public DataElement(XElement otherElem) : base(otherElem) { }
+
+        public DataElement(String xmlName) : base(xmlName) { }
+    }
+
+
+    public class WrapperElement : XElement
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(String name)
+        {
+            PropertyChangedEventHandler changedHandler = PropertyChanged;
+
+            if (changedHandler != null)
+            {
+                changedHandler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+        public XName ElementName
         {
             get
             {
-                ObservableCollection<xmlAttribute> returnable = new ObservableCollection<xmlAttribute>();
-                foreach (XAttribute item in Attributes())
+                return this.Name;
+            }
+        }
+
+        public String ElementValue
+        {
+            set
+            {
+                this.Value = value;
+                OnPropertyChanged("ElementValue");
+            }
+            get
+            {
+                return this.Value;
+            }
+        }
+
+        public ObservableCollection<AttributesElement> AttributeElements
+        {
+            get
+            {
+                ObservableCollection<AttributesElement> returnable = new ObservableCollection<AttributesElement>();
+                foreach (XElement item in Elements())
                 {
-                    returnable.Add(new xmlAttribute(item));
+                    if (item.HasElements == false && item.HasAttributes == true)
+                    {
+                        returnable.Add(new AttributesElement(item));
+                    }
                 }
                 return returnable;
             }
         }
 
-        public SingleElement(XElement otherElem) : base(otherElem) { }
+        public WrapperElement(XElement otherElem) : base(otherElem) { }
 
-        public SingleElement(String xmlName) : base(xmlName) { }
+        public WrapperElement(String xmlName) : base(xmlName) { }
     }
 
     public class AttributesElement : XElement
@@ -476,18 +533,18 @@ namespace ES_XML_Editor
             }
         }
 
-        public String ElementValue
-        {
-            set
-            {
-                this.Value = value;
-                OnPropertyChanged("ElementValue");
-            }
-            get
-            {
-                return this.Value;
-            }
-        }
+        //public String ElementValue
+        //{
+        //    set
+        //    {
+        //        this.Value = value;
+        //        OnPropertyChanged("ElementValue");
+        //    }
+        //    get
+        //    {
+        //        return this.Value;
+        //    }
+        //}
 
         public ObservableCollection<xmlAttribute> xmlAttributes
         {
@@ -555,29 +612,29 @@ namespace ES_XML_Editor
             }
         }
 
-        public ObservableCollection<xmlElement> allXmlElements
+        public ObservableCollection<xmlElement> xmlElements
         {
             get
             {
-                ObservableCollection<xmlElement> returnable = new ObservableCollection<xmlElement>();
-                foreach (XElement item in Elements())
-                {
-                    returnable.Add(new xmlElement(item));
-                }
-                return returnable;
+
+                //ObservableCollection<xmlElement> returnable = new ObservableCollection<xmlElement>();
+                //foreach (XElement item in Elements())
+                //{
+                //    returnable.Add(new xmlElement(item));
+                //}
+                return new ObservableCollection<xmlElement>(ElementList());
             }
         }
 
-        public ObservableCollection<xmlElement> procreatingXmlElements
+        public ObservableCollection<xmlElement> childRearingElements
         {
             get
             {
-                
                 ObservableCollection<xmlElement> returnable = new ObservableCollection<xmlElement>();
-                foreach (XElement item in Elements())
+                foreach (xmlElement item in ElementList())
                 {
                     //List<XElement> temp= new List<XElement>(Elements());
-                    if (item.HasElements == true)
+                    if (item.ElementList().Count > 1 || (item.ElementList().Count == 1 && item.HasAttributes == true))
                     {
                         returnable.Add(new xmlElement(item));
                     }
@@ -586,16 +643,49 @@ namespace ES_XML_Editor
             }
         }
 
-        public ObservableCollection<SingleElement> lonelyXmlElements
+        public ObservableCollection<WrapperElement> dummyElements
         {
             get
             {
-                ObservableCollection<SingleElement> returnable = new ObservableCollection<SingleElement>();
+                ObservableCollection<WrapperElement> returnable = new ObservableCollection<WrapperElement>();
+                foreach (xmlElement item in ElementList())
+                {
+                    //List<XElement> temp= new List<XElement>(Elements());
+                    if (item.ElementList().Count == 1 && item.HasAttributes == false)
+                    {
+                        returnable.Add(new WrapperElement(item));
+                    }
+                }
+                return returnable;
+            }
+        }
+
+        public ObservableCollection<DataElement> lonelyElements
+        {
+            get
+            {
+                ObservableCollection<DataElement> returnable = new ObservableCollection<DataElement>();
                 foreach (XElement item in Elements())
                 {
-                    if (item.HasElements == false)
+                    if (item.HasElements == false && item.HasAttributes == false)
                     {
-                        returnable.Add(new SingleElement(item));
+                        returnable.Add(new DataElement(item));
+                    }
+                }
+                return returnable;
+            }
+        }
+
+        public ObservableCollection<AttributesElement> AttributeElements
+        {
+            get
+            {
+                ObservableCollection<AttributesElement> returnable = new ObservableCollection<AttributesElement>();
+                foreach (XElement item in Elements())
+                {
+                    if (item.HasElements == false && item.HasAttributes == true)
+                    {
+                        returnable.Add(new AttributesElement(item));
                     }
                 }
                 return returnable;
@@ -605,6 +695,26 @@ namespace ES_XML_Editor
         public xmlElement(XElement otherElem) : base(otherElem) { }
 
         public xmlElement(String xmlName) : base(xmlName) { }
+
+        private List<xmlElement> ElementList()
+        {
+            List<xmlElement> theList = new List<xmlElement>();
+            foreach (XElement item in Elements())
+            {
+                theList.Add(new xmlElement(item));
+            }
+            return theList;
+        }
+
+        private List<xmlElement> ListConverter(List<XElement> source)
+        {
+            List<xmlElement> theList = new List<xmlElement>();
+            foreach (XElement item in source)
+            {
+                theList.Add(new xmlElement(item));
+            }
+            return theList;
+        }
     }
 
 }
