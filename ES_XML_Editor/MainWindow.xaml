@@ -6,9 +6,316 @@
         xmlns:linq="clr-namespace:System.Linq;assembly=System.Core"
         
         Height="350" Width="525" WindowStyle="ThreeDBorderWindow" Closing="closingWindow" WindowStartupLocation="CenterScreen" ShowInTaskbar="False" ScrollViewer.CanContentScroll="True">
+    <Window.Resources>
+
+        <DataTemplate x:Key="xmlListItemTemplate">
+            <Expander Margin="5,10" IsExpanded="True" BorderBrush="Black" BorderThickness="1" Background="#FFA1BDE0" Height="{Binding Value, ElementName=slider, Mode=OneWay}">
+                <Expander.Resources>
+
+                    <DataTemplate DataType="{x:Type ESXE:xmlAttribute}">
+                        <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal">
+                            <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center" Margin="5,5,0,5"/>
+                            <TextBlock Text="= " VerticalAlignment="Center" Margin="0,5"/>
+                            <TextBlock HorizontalAlignment="Left" Text="{Binding Path=Value}" VerticalAlignment="Top" Margin="0,5,5,5"/>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="lonelyElement" DataType="{x:Type ESXE:DataElement}">
+                        <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal">
+                            <TextBlock HorizontalAlignment="Left" Text="{Binding Path=Name}" VerticalAlignment="Center" Margin="5,5,0,5"/>
+                            <TextBlock HorizontalAlignment="Left" Text=":: " VerticalAlignment="Center" Margin="0,5"/>
+                            <TextBlock HorizontalAlignment="Left" Text="{Binding Path=Value}" VerticalAlignment="Center" Margin="0,5,5,5"/>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="semiLonelyElement" DataType="{x:Type ESXE:AttributesElement}">
+                        <GroupBox Header="{Binding Path=Name}" VerticalAlignment="Top">
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal">
+                                <ItemsControl ItemsSource="{Binding Path=xmlAttributes}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </StackPanel>
+                        </GroupBox>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="dummyElement" DataType="{x:Type ESXE:WrapperElement}">
+                        <DataTemplate.Resources>
+                            <DataTemplate x:Key="childAttributeElement">
+                                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal">
+                                    <TextBlock HorizontalAlignment="Left" Text="{Binding Path=Name}" VerticalAlignment="Center" Margin="5,5,0,5"/>
+                                    <TextBlock HorizontalAlignment="Left" Text=":: " VerticalAlignment="Center" Margin="0,5"/>
+                                    <ItemsControl ItemsSource="{Binding Path=xmlAttributes}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataTemplate.Resources>
+                        <GroupBox VerticalAlignment="Top">
+                            <GroupBox.Header>
+                                <StackPanel VerticalAlignment="Top" Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center"/>
+                                    <TextBlock Text=":: " VerticalAlignment="Center"/>
+                                    <StackPanel VerticalAlignment="Top" Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Path=childDataElement.Name}" VerticalAlignment="Center"/>
+
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox.Header>
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal">
+                                <TextBlock Text="{Binding Path=childDataElement.ElementValue}" VerticalAlignment="Center"/>
+                                <Label Content="{Binding Path=AttributeElement}" ContentTemplate="{StaticResource childAttributeElement}" VerticalAlignment="Center"/>
+                                <!--
+                                    <ItemsControl ItemsSource="{Binding Path=childDataElement}" ItemTemplate="{StaticResource lonelyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                    <ItemsControl ItemsSource="{Binding Path=AttributeElement}" ItemTemplate="{StaticResource childAttributeElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                    -->
+                            </StackPanel>
+                        </GroupBox>
+
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="ProcreatingElement" DataType="{x:Type ESXE:xmlElement}">
+                        <GroupBox Header="{Binding Path=Name}" VerticalAlignment="Top">
+                            <GroupBox.Resources>
+                                <!--
+                                    <DataTemplate x:Key="subSingleElement" DataType="{x:Type ESXE:xmlElement}">
+                                        <GroupBox Header="{Binding Path=Name}" VerticalAlignment="Top">
+                                            <WrapPanel Orientation="Horizontal">
+                                                <ItemsControl ItemsSource="{Binding Path=xmlAttributes}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <WrapPanel IsItemsHost="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" Orientation="Vertical"/>
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                </ItemsControl>
+                                                <ItemsControl ItemsSource="{Binding Path=lonelyElements}" ItemTemplate="{StaticResource lonelyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <WrapPanel IsItemsHost="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" Orientation="Vertical"/>
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                </ItemsControl>
+                                            </WrapPanel>
+                                        </GroupBox>
+                                    </DataTemplate>
+                                    -->
+                            </GroupBox.Resources>
+                            <WrapPanel Orientation="Horizontal">
+                                <ItemsControl ItemsSource="{Binding Path=xmlAttributes}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                                <ItemsControl ItemsSource="{Binding Path=lonelyElements}" ItemTemplate="{StaticResource lonelyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                                <ItemsControl ItemsSource="{Binding Path=dummyElements}" ItemTemplate="{StaticResource dummyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+
+                                <ItemsControl ItemsSource="{Binding Path=AttributeElements}" ItemTemplate="{StaticResource semiLonelyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+
+                            </WrapPanel>
+                        </GroupBox>
+                    </DataTemplate>
+
+                </Expander.Resources>
+                <Expander.Header>
+                    <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal">
+                        <TextBlock MinWidth="50" HorizontalAlignment="Left" Text="{Binding Path=Attribute[Name].Value, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    </StackPanel>
+                </Expander.Header>
+                <GroupBox Header="{Binding Path=Name}" VerticalAlignment="Top">
+                    <WrapPanel Orientation="Horizontal">
+                        <ItemsControl ItemsSource="{Binding Path=xmlAttributes}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                        <ItemsControl ItemsSource="{Binding Path=lonelyElements}" ItemTemplate="{StaticResource lonelyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                        <ItemsControl ItemsSource="{Binding Path=dummyElements}" ItemTemplate="{StaticResource dummyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                        <ItemsControl ItemsSource="{Binding Path=AttributeElements}" ItemTemplate="{StaticResource semiLonelyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                        <ItemsControl ItemsSource="{Binding Path=childRearingElements}" ItemTemplate="{StaticResource ProcreatingElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True" Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </WrapPanel>
+                </GroupBox>
+            </Expander>
+        </DataTemplate>
+
+        <DataTemplate x:Key="viewerTemplate">
+            <GroupBox VerticalAlignment="Top">
+                <GroupBox.Resources>
+
+                    <DataTemplate DataType="{x:Type ESXE:xmlAttribute}">
+                        <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal">
+                            <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center"/>
+                            <TextBlock Text=": " VerticalAlignment="Center"/>
+                            <TextBlock HorizontalAlignment="Left" Text="{Binding Path=Value}" VerticalAlignment="Top"/>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="lonelyElement" DataType="{x:Type ESXE:DataElement}">
+                        <GroupBox Header="{Binding Path=Name}" VerticalAlignment="Top">
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal">
+                                <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=xmlAttributes}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                                <TextBlock HorizontalAlignment="Left" Text="{Binding Path=Value}" VerticalAlignment="Top"/>
+                            </StackPanel>
+                        </GroupBox>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="ProcreatingElement" DataType="{x:Type ESXE:xmlElement}">
+                        <GroupBox Header="{Binding Path=Name}" VerticalAlignment="Top">
+                            <GroupBox.Resources>
+                                <DataTemplate x:Key="subSingleElement" DataType="{x:Type ESXE:xmlElement}">
+                                    <GroupBox Header="{Binding Path=Name}" VerticalAlignment="Top">
+                                        <WrapPanel Orientation="Horizontal">
+                                            <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=xmlAttributes}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                            </ItemsControl>
+                                            <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=lonelyElements}" ItemTemplate="{StaticResource lonelyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                            </ItemsControl>
+                                        </WrapPanel>
+                                    </GroupBox>
+                                </DataTemplate>
+                            </GroupBox.Resources>
+                            <WrapPanel Orientation="Horizontal">
+                                <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=xmlAttributes}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                                <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=lonelyElements}" ItemTemplate="{StaticResource lonelyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                                <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=childRearingElements}" ItemTemplate="{StaticResource subSingleElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </WrapPanel>
+                        </GroupBox>
+                    </DataTemplate>
+
+                </GroupBox.Resources>
+                <GroupBox.Header>
+                    <TextBlock HorizontalAlignment="Left" Text="{Binding Path=Attribute[Name].Value, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                </GroupBox.Header>
+                <GroupBox Header="{Binding Path=Name}" VerticalAlignment="Top">
+                    <WrapPanel Orientation="Horizontal">
+
+                        <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=xmlAttributes}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0"  >
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                        <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=lonelyElements}" ItemTemplate="{StaticResource lonelyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0"  >
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                        <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=childRearingElements}" ItemTemplate="{StaticResource ProcreatingElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0"  >
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True" Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </WrapPanel>
+                </GroupBox>
+            </GroupBox>
+        </DataTemplate>
+
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="29*"/>
+            <ColumnDefinition Width="50"/>
             <ColumnDefinition Width="488*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -16,23 +323,23 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ListBox ItemTemplate="{StaticResource xmlListItemTemplate}" x:Name="windowListbox" Grid.Row="1" Background="#FFE6E6E6" SelectionChanged="windowListBoxSelectionChanged" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Padding="5,0,10,0" ScrollViewer.CanContentScroll="False" SourceUpdated="listBoxSourceUpdatedHandler" Grid.Column="1" IsSynchronizedWithCurrentItem="True" SelectionMode="Extended">
+        <ListBox ItemTemplate="{StaticResource xmlListItemTemplate}" x:Name="windowListbox" Grid.Row="1" Background="#FFE6E6E6" SelectionChanged="windowListBoxSelectionChanged" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Auto" Padding="5,0,10,0" ScrollViewer.CanContentScroll="False" SourceUpdated="listBoxSourceUpdatedHandler" Grid.Column="1" IsSynchronizedWithCurrentItem="True" SelectionMode="Extended">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel IsItemsHost="True"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
-            
         </ListBox>
-        <StackPanel Background="#FFC1C1C1" Orientation="Horizontal" Grid.ColumnSpan="2">
+        <DockPanel Background="#FFC1C1C1" Grid.ColumnSpan="2" LastChildFill="False" ScrollViewer.VerticalScrollBarVisibility="Disabled">
             <Button Content="Open File" HorizontalAlignment="Left" Click="openFileButtonClick"/>
-
-            <TextBlock TextWrapping="Wrap" Text="selected indices: " HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <TextBlock x:Name="currentFileLabel" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,3.02,0,2.98"/>
-            <TextBlock TextWrapping="Wrap" Text="Full File Path: " HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <TextBlock x:Name="currentFileFullPathLabel" TextWrapping="Wrap" Text="none" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,3.02,0,2.98"/>
-
-        </StackPanel>
+            <StackPanel Orientation="Horizontal" Visibility="Collapsed">
+                <TextBlock TextWrapping="Wrap" Text="selected indices: " HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                <TextBlock x:Name="currentFileLabel" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,3.02,0,2.98"/>
+                <TextBlock TextWrapping="Wrap" Text="Full File Path: " HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                <TextBlock x:Name="currentFileFullPathLabel" TextWrapping="Wrap" Text="none" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,3.02,0,2.98"/>
+            </StackPanel>
+            <Slider x:Name="slider" Maximum="500" Minimum="100" SmallChange="10" TickPlacement="Both" TickFrequency="50" LargeChange="100" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" Width="100" Foreground="Black" DockPanel.Dock="Right"/>
+        </DockPanel>
         <ScrollViewer x:Name="listBoxItemViewer" Background="#FFE6E6E6" Grid.Column="1" Grid.Row="2" VerticalScrollBarVisibility="Auto" ContentTemplate="{StaticResource viewerTemplate}"/>
         <GridSplitter Grid.Row="1" Width="5"/>
         <GridSplitter Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Grid.Row="2" Grid.Column="1"/>

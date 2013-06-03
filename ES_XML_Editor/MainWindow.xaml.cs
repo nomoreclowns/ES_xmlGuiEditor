@@ -25,6 +25,10 @@ namespace ES_XML_Editor
         private controllerShowError contErrorDisplayer;
         private controllerSave contFileSaver;
         private controllerClose contProgramCloser;
+        private controllerGetSelectedData contDataGetter;
+        private controllerManipulateSetting contSettingHandler;
+
+        private xmlElement editingItem;
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
@@ -48,7 +52,7 @@ namespace ES_XML_Editor
             {
                 throw new NullReferenceException("MainWindow Constructor cannot have a null reference to editorFunctions");
             }
-            editorFunctions.retrieveDelegates(out contErrorDisplayer, out contFileOpener, out contBinder, out contFileSaver, out contProgramCloser);
+            editorFunctions.retrieveDelegates(out contErrorDisplayer, out contFileOpener, out contBinder, out contDataGetter, out contSettingHandler, out contFileSaver, out contProgramCloser);
 
         }
 
@@ -91,10 +95,10 @@ namespace ES_XML_Editor
 
             contFileOpener(out theFile, out fullPath);
             
-            contBinder(ref windowListbox, ref listBoxItemViewer);
+            contBinder(ref windowListbox);
 
             //currentFileLabel.Text = theFile;
-            currentFileFullPathLabel.Text = fullPath;
+            //currentFileFullPathLabel.Text = fullPath;
         }
 
         /* ************************************************************************************************************************
@@ -103,16 +107,11 @@ namespace ES_XML_Editor
         {
             try
             {
-                currentFileLabel.Text = "";
-                foreach (int index in listBoxSelectedItems)
-                {
-                    currentFileLabel.Text += index.ToString()+" ";
-                }
-                
+                contDataGetter(listBoxSelectedItems, ref editingItem);
             }
             catch
             {
-                currentFileLabel.Text = "Error";
+                //currentFileLabel.Text = "Error";
             }
         }
 
@@ -130,5 +129,8 @@ namespace ES_XML_Editor
         {
             return currentFileFullPathLabel.Text;
         }
+
+        
+
     }
 }

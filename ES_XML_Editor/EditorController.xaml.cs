@@ -17,13 +17,22 @@ using System.Windows.Controls;
 
 namespace ES_XML_Editor
 {
+
+    #region delegatesAndContainerClass
+
+    public delegate void controllerManipulateSetting(String delSettingKey, ref String delSettingValue, bool delSaveSetting = false);
+
     public delegate void controllerOpenFile(out String delFileName, out String delFullFilePath);
 
-    public delegate void controllerBind(ref ListBox delListBox, ref ScrollViewer delDetailBox);
+    public delegate void controllerBind(ref ListBox delListBox);
 
     public delegate void controllerShowError(String delMessageOfDoom);
 
     public delegate void controllerSave();
+
+    public delegate void controlerAddItem();
+
+    public delegate void controllerGetSelectedData(int[] delIndices, ref xmlElement delItemContainer);
 
     public delegate void controllerClose();
 
@@ -34,9 +43,11 @@ namespace ES_XML_Editor
         private controllerOpenFile pFileOpener;
         private controllerBind pBinder;
         private controllerShowError pErrorDisplayer;
+        private controllerGetSelectedData pSelectedDataGetter;
         private controllerSave pFileSaver;
         private controllerClose pProgramCloser;
         private controllerErrorCallback pAccessViolationInformer;
+        private controllerManipulateSetting pSettingHandler;
 
         public controllerOpenFile fileOpener
         {
@@ -86,14 +97,16 @@ namespace ES_XML_Editor
             }
         }
 
-        public controllerDelegateContainer(controllerShowError iErrorDisplayer, controllerErrorCallback iAccessViolationInformer, controllerOpenFile iFileOpener = null, controllerBind iBinder = null, controllerSave iFileSaver = null, controllerClose iProgramCloser = null)
+        public controllerDelegateContainer(controllerShowError iErrorDisplayer, controllerErrorCallback iAccessViolationInformer, controllerOpenFile iFileOpener = null, controllerBind iBinder = null, controllerGetSelectedData iSelectedDataGetter = null, controllerManipulateSetting iSettingHandler = null, controllerSave iFileSaver = null, controllerClose iProgramCloser = null)
         {
             pErrorDisplayer = iErrorDisplayer;
             pFileOpener = iFileOpener;
             pBinder = iBinder;
+            pSelectedDataGetter = iSelectedDataGetter;
             pFileSaver = iFileSaver;
             pProgramCloser = iProgramCloser;
             pAccessViolationInformer = iAccessViolationInformer;
+            pSettingHandler = iSettingHandler;
         }
 
         public void unauthorizedAccess()
@@ -101,17 +114,20 @@ namespace ES_XML_Editor
             ;
         }
 
-        public void retrieveDelegates(out controllerShowError iErrorDisplayer, out controllerOpenFile iFileOpener, out controllerBind iBinder, out controllerSave iFileSaver, out controllerClose iProgramCloser)
+        public void retrieveDelegates(out controllerShowError iErrorDisplayer, out controllerOpenFile iFileOpener, out controllerBind iBinder, out controllerGetSelectedData iSelectedDataGetter, out controllerManipulateSetting iSettingHandler, out controllerSave iFileSaver, out controllerClose iProgramCloser)
         {
             iErrorDisplayer = pErrorDisplayer;
             iFileOpener = pFileOpener;
             iBinder = pBinder;
+            iSelectedDataGetter = pSelectedDataGetter;
             iFileSaver = pFileSaver;
             iProgramCloser = pProgramCloser;
+            iSettingHandler = pSettingHandler;
         }
 
     }
 
+    #endregion
 
     /// <summary>
     /// Interaction logic for EditorController.xaml
@@ -119,27 +135,22 @@ namespace ES_XML_Editor
     public partial class EditorController : Window
     {
         // Shortcut variable for quicker access to the .settings file
-        private static ProgramSettings settings = ProgramSettings.Default;
+        private static ProgramSettings embeddedSettings = ProgramSettings.Default;
 
         // list that stores the contents of a file
-        private XElement dataList;
-        private xmlElement dataList2;
+        private xmlElement dataContainer;
 
-        private CollectionView dataListView;
+        // the current "view" of the list
+        private CollectionView dataContainerView;
 
-        //public IEnumerable<XElement> bindableList
-        //{
-        //    get
-        //    {
-        //        return null;
-        //    }
-        //}
+        String currentFile;
 
-        // String to hold the directory for program files on the users computer
+        //String currentDirectory;
+
         String ProgramFolder;
 
         // Manager for the users' settings file
-        private KeyValuePairDataBase settingsFile;
+        private KeyValuePairDataBase userSettings;
 
         // String to hold the users' last visited directory when using this program.
         // Eventually gets stored as a setting in a file
@@ -154,11 +165,11 @@ namespace ES_XML_Editor
         {
             InitializeComponent();
 
-            ProgramFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), settings.progName);
+            ProgramFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), embeddedSettings.progName);
 
             retrieveSettingsFile(ProgramFolder);
 
-            directoryLastUsed = settingsFile.getValue(EditorSettings.lastUsedDirectory.ToString());
+            directoryLastUsed = userSettings.getValue(EditorSettings.lastUsedDirectory.ToString());
 
             
             if (Directory.Exists(directoryLastUsed) == false)
@@ -166,7 +177,7 @@ namespace ES_XML_Editor
                 directoryLastUsed= Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             }
 
-            baseWindowObject = new MainWindow(new controllerDelegateContainer(showErrorMessage, delegateContainerErrorFunction, openFile, bindFunction, saveData, closeProgram));
+            baseWindowObject = new MainWindow(new controllerDelegateContainer(showErrorMessage, delegateContainerErrorFunction, openFile, bindFunction, selectedData, setOrGetSetting, saveData, closeProgram));
             baseWindowObject.Show();
         }
 
@@ -174,26 +185,17 @@ namespace ES_XML_Editor
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        public void openFile(out String fileName, out String fullFilePath)
+        protected void openFile(out String fileName, out String fullFilePath)
         {
             OpenFileDialog someFileChooser;
 
-            fileName = openFileChooser(out someFileChooser, out fullFilePath);
+            currentFile = fileName = openFileChooser(out someFileChooser, out fullFilePath);
             
             FileHandler someFile = new FileHandler(someFileChooser.FileName);
             //dataList = someFile.open();
-            dataList2 = new xmlElement(someFile.open());
-            dataListView = (CollectionView)CollectionViewSource.GetDefaultView(dataList2.xmlElements);
+            dataContainer = new xmlElement(someFile.open());
+            dataContainerView = (CollectionView)CollectionViewSource.GetDefaultView(dataContainer.xmlElements);
         }
-
-        //public void openFile()
-        //{
-        //    String fileName = openFileChooser();
-
-        //    FileHandler someFile = new FileHandler(fileName);
-        //    dataList = someFile.open();
-
-        //}
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
@@ -212,16 +214,12 @@ namespace ES_XML_Editor
         //    }
         //}
 
-        public void bindFunction(ref ListBox guiListBox, ref ScrollViewer detailBox)
+        protected void bindFunction(ref ListBox guiListBox)
         {
             try
             {
-                //guiListBox.ItemTemplate = (DataTemplate)FindResource("WeaponModule");
-                //guiListBox.DataContext = dataList.Elements();
-
-
-                guiListBox.ItemsSource = dataListView;
-                detailBox.Content = dataListView.CurrentItem;
+                guiListBox.ItemsSource = dataContainerView;
+                //detailBox.Content = dataListView.CurrentItem;
                 
             }
             catch
@@ -232,25 +230,93 @@ namespace ES_XML_Editor
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        public void showErrorMessage(String messageOfDoom)
+        protected void selectedData(int[] indices, ref xmlElement itemContainer)
+        {
+            if (indices.Length == 1)
+            {
+                itemContainer = dataContainer.xmlElements[indices[0]]
+                    ;
+            }
+            else
+            {
+                itemContainer = createItem();
+            }
+        }
+        
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        protected void addData(xmlElement data)
+        {
+            dataContainer.Add(data);
+        }
+
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        protected xmlElement createItem()
+        {
+            return recuresiveElementCreator(dataContainer.xmlElements[0]);
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        protected xmlElement recuresiveElementCreator( xmlElement source)
+        {
+            xmlElement temp = new xmlElement(source.Name.ToString());
+
+            temp.SetValue("");
+            foreach (XAttribute attr in source.Attributes())
+            {
+                temp.SetAttributeValue(attr.Name, "");
+            }
+            foreach (xmlElement item in source.xmlElements)
+            {
+                try
+                {
+                    temp.Add(recuresiveElementCreator(item));
+                }
+                catch
+                {
+                }
+            }
+            return temp;
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        protected void setOrGetSetting(String settingKey, ref String settingValue, bool saveSetting = false)
+        {
+            if (saveSetting == false)
+            {
+                settingValue = userSettings.getValue(settingKey);
+            }
+            else
+            {
+                userSettings.setKeyValuePair(settingKey, settingValue);
+            }
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        protected void showErrorMessage(String messageOfDoom)
         {
             MessageBox.Show(this, messageOfDoom, "Error!", MessageBoxButton.OK);
         }
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        public void saveData()
+        protected void saveData()
         {
             String fileName= baseWindowObject.currentFile();
             if (File.Exists(fileName))
             {
-                dataList2.Save(fileName);
+                dataContainer.Save(fileName);
             }
             
         }
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        public void closeProgram()
+        protected void closeProgram()
         {
             try
             {
@@ -263,7 +329,7 @@ namespace ES_XML_Editor
             }
         }
 
-        public void delegateContainerErrorFunction()
+        protected void delegateContainerErrorFunction()
         {
             ;
         }
@@ -287,8 +353,7 @@ namespace ES_XML_Editor
             {
                 fullPath = fileChooser.FileName;
                 directoryLastUsed = fileChooser.FileName.TrimEnd(fileChooser.SafeFileName.ToCharArray());
-                //showErrorMessage(directoryLastUsed);
-                settingsFile.setKeyValuePair(EditorSettings.lastUsedDirectory.ToString(), directoryLastUsed);
+                userSettings.setKeyValuePair(EditorSettings.lastUsedDirectory.ToString(), directoryLastUsed);
                 saveSettings();
                 return fileChooser.SafeFileName;
             }
@@ -302,14 +367,14 @@ namespace ES_XML_Editor
             String settingsPath = System.IO.Path.Combine(ProgramFolder, "settings.xml");
             try
             {
-                settingsFile.saveToFile(settingsPath);
+                userSettings.saveToFile(settingsPath);
             }
             catch
             {
 
                 Directory.CreateDirectory(ProgramFolder);
-                settingsFile = new KeyValuePairDataBase();
-                settingsFile.saveToFile(settingsPath);
+                userSettings = new KeyValuePairDataBase();
+                userSettings.saveToFile(settingsPath);
             }
         }
 
@@ -320,11 +385,11 @@ namespace ES_XML_Editor
             String settingsPath = System.IO.Path.Combine(ProgramFolder, "settings.xml");
             try
             {
-                settingsFile = new KeyValuePairDataBase(settingsPath);
+                userSettings = new KeyValuePairDataBase(settingsPath);
             }
             catch
             {
-                settingsFile= new KeyValuePairDataBase();
+                userSettings= new KeyValuePairDataBase();
             }
         }
 
@@ -348,373 +413,12 @@ namespace ES_XML_Editor
         //    settingsFile.setKeyValuePair(setting.ToString(), settingValue);
         //}
 
-
-    }
-
-    //class for handling the user's settings file
-    public class SettingsManager
-    {
-
-    }
-
     public enum EditorSettings
     {
-        lastUsedDirectory
+        lastUsedDirectory,
+        listItemHeight,
+        itemEditorHeight
     }
-
-
-    public class xmlAttribute : XAttribute
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged(String name)
-        {
-            PropertyChangedEventHandler changedHandler = PropertyChanged;
-
-            if (changedHandler != null)
-            {
-                changedHandler(this, new PropertyChangedEventArgs(name));
-            }
-        }
-
-        public XName AttributeName
-        {
-            get
-            {
-                return this.Name;
-            }
-        }
-
-        public String AttributeValue
-        {
-            set
-            {
-                this.Value = value;
-                OnPropertyChanged("AttributeValue");
-            }
-            get
-            {
-                return this.Value;
-            }
-        }
-
-        public xmlAttribute(XAttribute otherAttr) : base(otherAttr) { }
-    }
-
-    public class DataElement : XElement
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged(String name)
-        {
-            PropertyChangedEventHandler changedHandler = PropertyChanged;
-
-            if (changedHandler != null)
-            {
-                changedHandler(this, new PropertyChangedEventArgs(name));
-            }
-        }
-
-        public XName ElementName
-        {
-            get
-            {
-                return this.Name;
-            }
-        }
-
-        public String ElementValue
-        {
-            set
-            {
-                this.Value = value;
-                OnPropertyChanged("ElementValue");
-            }
-            get
-            {
-                return this.Value;
-            }
-        }
-
-        //public ObservableCollection<xmlAttribute> xmlAttributes
-        //{
-        //    get
-        //    {
-        //        ObservableCollection<xmlAttribute> returnable = new ObservableCollection<xmlAttribute>();
-        //        foreach (XAttribute item in Attributes())
-        //        {
-        //            returnable.Add(new xmlAttribute(item));
-        //        }
-        //        return returnable;
-        //    }
-        //}
-
-        public DataElement(XElement otherElem) : base(otherElem) { }
-
-        public DataElement(String xmlName) : base(xmlName) { }
-    }
-
-
-    public class WrapperElement : XElement
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged(String name)
-        {
-            PropertyChangedEventHandler changedHandler = PropertyChanged;
-
-            if (changedHandler != null)
-            {
-                changedHandler(this, new PropertyChangedEventArgs(name));
-            }
-        }
-
-        public XName ElementName
-        {
-            get
-            {
-                return this.Name;
-            }
-        }
-
-        public String ElementValue
-        {
-            set
-            {
-                this.Value = value;
-                OnPropertyChanged("ElementValue");
-            }
-            get
-            {
-                return this.Value;
-            }
-        }
-
-        public ObservableCollection<AttributesElement> AttributeElements
-        {
-            get
-            {
-                ObservableCollection<AttributesElement> returnable = new ObservableCollection<AttributesElement>();
-                foreach (XElement item in Elements())
-                {
-                    if (item.HasElements == false && item.HasAttributes == true)
-                    {
-                        returnable.Add(new AttributesElement(item));
-                    }
-                }
-                return returnable;
-            }
-        }
-
-        public WrapperElement(XElement otherElem) : base(otherElem) { }
-
-        public WrapperElement(String xmlName) : base(xmlName) { }
-    }
-
-    public class AttributesElement : XElement
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged(String name)
-        {
-            PropertyChangedEventHandler changedHandler = PropertyChanged;
-
-            if (changedHandler != null)
-            {
-                changedHandler(this, new PropertyChangedEventArgs(name));
-            }
-        }
-
-        public XName ElementName
-        {
-            get
-            {
-                return this.Name;
-            }
-        }
-
-        //public String ElementValue
-        //{
-        //    set
-        //    {
-        //        this.Value = value;
-        //        OnPropertyChanged("ElementValue");
-        //    }
-        //    get
-        //    {
-        //        return this.Value;
-        //    }
-        //}
-
-        public ObservableCollection<xmlAttribute> xmlAttributes
-        {
-            get
-            {
-                ObservableCollection<xmlAttribute> returnable = new ObservableCollection<xmlAttribute>();
-                foreach (XAttribute item in Attributes())
-                {
-                    returnable.Add(new xmlAttribute(item));
-                }
-                return returnable;
-            }
-        }
-
-        public AttributesElement(XElement otherElem) : base(otherElem) { }
-
-        public AttributesElement(String xmlName) : base(xmlName) { }
-    }
-
-    public class xmlElement : XElement
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged(String name)
-        {
-            PropertyChangedEventHandler changedHandler = PropertyChanged;
-
-            if (changedHandler != null)
-            {
-                changedHandler(this, new PropertyChangedEventArgs(name));
-            }
-        }
-
-        public XName ElementName
-        {
-            get
-            {
-                return this.Name;
-            }
-        }
-
-        public String ElementValue
-        {
-            set
-            {
-                this.Value = value;
-                OnPropertyChanged("ElementValue");
-            }
-            get
-            {
-                return this.Value;
-            }
-        }
-
-        public ObservableCollection<xmlAttribute> xmlAttributes
-        {
-            get
-            {
-                ObservableCollection<xmlAttribute> returnable= new ObservableCollection<xmlAttribute>();
-                foreach (XAttribute item in Attributes())
-                {
-                    returnable.Add(new xmlAttribute(item));
-                }
-                return returnable;
-            }
-        }
-
-        public ObservableCollection<xmlElement> xmlElements
-        {
-            get
-            {
-
-                //ObservableCollection<xmlElement> returnable = new ObservableCollection<xmlElement>();
-                //foreach (XElement item in Elements())
-                //{
-                //    returnable.Add(new xmlElement(item));
-                //}
-                return new ObservableCollection<xmlElement>(ElementList());
-            }
-        }
-
-        public ObservableCollection<xmlElement> childRearingElements
-        {
-            get
-            {
-                ObservableCollection<xmlElement> returnable = new ObservableCollection<xmlElement>();
-                foreach (xmlElement item in ElementList())
-                {
-                    //List<XElement> temp= new List<XElement>(Elements());
-                    if (item.ElementList().Count > 1 || (item.ElementList().Count == 1 && item.HasAttributes == true))
-                    {
-                        returnable.Add(new xmlElement(item));
-                    }
-                }
-                return returnable;
-            }
-        }
-
-        public ObservableCollection<WrapperElement> dummyElements
-        {
-            get
-            {
-                ObservableCollection<WrapperElement> returnable = new ObservableCollection<WrapperElement>();
-                foreach (xmlElement item in ElementList())
-                {
-                    //List<XElement> temp= new List<XElement>(Elements());
-                    if (item.ElementList().Count == 1 && item.HasAttributes == false)
-                    {
-                        returnable.Add(new WrapperElement(item));
-                    }
-                }
-                return returnable;
-            }
-        }
-
-        public ObservableCollection<DataElement> lonelyElements
-        {
-            get
-            {
-                ObservableCollection<DataElement> returnable = new ObservableCollection<DataElement>();
-                foreach (XElement item in Elements())
-                {
-                    if (item.HasElements == false && item.HasAttributes == false)
-                    {
-                        returnable.Add(new DataElement(item));
-                    }
-                }
-                return returnable;
-            }
-        }
-
-        public ObservableCollection<AttributesElement> AttributeElements
-        {
-            get
-            {
-                ObservableCollection<AttributesElement> returnable = new ObservableCollection<AttributesElement>();
-                foreach (XElement item in Elements())
-                {
-                    if (item.HasElements == false && item.HasAttributes == true)
-                    {
-                        returnable.Add(new AttributesElement(item));
-                    }
-                }
-                return returnable;
-            }
-        }
-
-        public xmlElement(XElement otherElem) : base(otherElem) { }
-
-        public xmlElement(String xmlName) : base(xmlName) { }
-
-        private List<xmlElement> ElementList()
-        {
-            List<xmlElement> theList = new List<xmlElement>();
-            foreach (XElement item in Elements())
-            {
-                theList.Add(new xmlElement(item));
-            }
-            return theList;
-        }
-
-        private List<xmlElement> ListConverter(List<XElement> source)
-        {
-            List<xmlElement> theList = new List<xmlElement>();
-            foreach (XElement item in source)
-            {
-                theList.Add(new xmlElement(item));
-            }
-            return theList;
-        }
     }
 
 }

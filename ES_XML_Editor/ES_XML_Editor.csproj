@@ -83,6 +83,7 @@
     </Compile>
     <Compile Include="KeyValuePairDataBase.cs" />
     <Compile Include="WeaponModule.cs" />
+    <Compile Include="xmlClasses.cs" />
     <Compile Include="XmlLoader.cs" />
     <Page Include="BaseWrapPanelDataItem.xaml">
       <SubType>Designer</SubType>
