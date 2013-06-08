@@ -327,6 +327,9 @@ namespace ES_XML_Editor
         private void saveItem(object sender, RoutedEventArgs e)
         {
             contItemEditor(this.itemEditorData, this.listBoxSelectedItems);
+
+            contBinder(ref dataViewSource);
+            dataView = dataViewSource;
         }
 
         /* ************************************************************************************************************************

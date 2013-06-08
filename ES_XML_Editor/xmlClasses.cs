@@ -659,8 +659,9 @@ namespace ES_XML_Editor
                 {
                     if (childAttr.Value == attrValue)
                     {
-                        this.Remove(pElements[i]);
-                        this.Add(replacingNode);
+                        this.pElements[i] = new xmlElem(replacingNode);
+                        //this.Remove(pElements[i]);
+                        //this.Add(replacingNode);
                         OnPropertyChanged("xmlElements");
                         OnPropertyChanged("childRearingElements");
                         OnPropertyChanged("dummyElements");

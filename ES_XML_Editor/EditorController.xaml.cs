@@ -115,13 +115,41 @@ namespace ES_XML_Editor
     /// <summary>
     /// Interaction logic for EditorController.xaml
     /// </summary>
-    public partial class EditorController : Window
+    public partial class EditorController : Window, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(String name)
+        {
+            PropertyChangedEventHandler changedHandler = PropertyChanged;
+
+            if (changedHandler != null)
+            {
+                changedHandler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
         // Shortcut variable for quicker access to the .settings file
         private static ProgramSettings embeddedSettings = ProgramSettings.Default;
 
         // list that stores the contents of a file
-        private xmlElem dataContainer;
+        private xmlElem dataContainerSource;
+
+        public xmlElem dataContainer
+        {
+            set
+            {
+                if (value != null)
+                {
+                    dataContainerSource = value;
+                    OnPropertyChanged("dataContainer");
+                }
+            }
+            get
+            {
+                return dataContainerSource;
+            }
+        }
 
         // the current "view" of the list
         private CollectionView dataContainerView;
@@ -165,8 +193,8 @@ namespace ES_XML_Editor
             {
                 currentFile = new FileHandler(workingDirectory, tempFileName);
 
-                dataContainer = new xmlElem(currentFile.open());
-                dataContainerView = (CollectionView)CollectionViewSource.GetDefaultView(dataContainer.xmlElements);
+                dataContainerSource = new xmlElem(currentFile.open());
+                dataContainerView = (CollectionView)CollectionViewSource.GetDefaultView(dataContainerSource.xmlElements);
 
             }
             catch
@@ -221,7 +249,7 @@ namespace ES_XML_Editor
 
             setOrGetSetting(EditorSettings.lastFileOpened, ref shortFileName, true);
 
-            dataContainer = new xmlElem(currentFile.open());
+            dataContainerSource = new xmlElem(currentFile.open());
 
             dataContainerView = (CollectionView)CollectionViewSource.GetDefaultView(dataContainer.xmlElements);
         }
@@ -233,8 +261,9 @@ namespace ES_XML_Editor
             //guiListBox.ItemsSource = dataContainerView;
             try
             {
-                guiCollectionView = dataContainerView;
-                //detailBox.Content = dataListView.CurrentItem;
+                //guiCollectionView = dataContainerView;
+
+                guiCollectionView = (CollectionView)CollectionViewSource.GetDefaultView(dataContainer.xmlElements);
 
             }
             catch
@@ -252,11 +281,11 @@ namespace ES_XML_Editor
         {
             if (indices.Length == 1)
             {
-                itemContainer = new xmlElem(dataContainer.xmlElements[indices[0]]);
+                itemContainer = new xmlElem(dataContainerSource.xmlElements[indices[0]]);
             }
             else
             {
-                itemContainer = createItem(dataContainer.xmlElements[0]);
+                itemContainer = createItem(dataContainerSource.xmlElements[0]);
             }
         }
         
@@ -265,24 +294,27 @@ namespace ES_XML_Editor
          *************************************************************************************************************************/
         protected void addData(xmlElem source)
         {
-            dataContainer.Add(source);
+            dataContainerSource.Add(source);
         }
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
         protected void editData(xmlElem data, int[] selectedIndeces)
         {
-            List<xmlElem> temp= new List<xmlElem>(dataContainer.xmlElements);
+            //List<xmlElem> temp= new List<xmlElem>(dataContainer.xmlElements);
 
             if (selectedIndeces.Length == 1)
             {
                 foreach (int index in selectedIndeces)
                 {
                     //XAttribute childAttribute = temp[index].Attribute("Name");
-                    dataContainer.replaceChildByAttrValue("Name", temp[index].Attribute("Name").Value, data);
-                    //dataContainer.replaceChildByAttrValue("Name", temp[index].Attribute("Name").Value, data); 
+                    dataContainerSource.replaceChildByAttrValue("Name", dataContainerSource.xmlElements[index].Attribute("Name").Value, data);
+                    
+                    
                 }
             }
+            OnPropertyChanged("dataContainer");
+
         }
 
         /* ************************************************************************************************************************
