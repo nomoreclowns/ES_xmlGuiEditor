@@ -42,6 +42,7 @@ namespace ES_XML_Editor
         private const EditorController.EditorSettings widthSettingEnum = EditorController.EditorSettings.editingWindowWidth;
         private const EditorController.EditorSettings editingItemSettingEnum = EditorController.EditorSettings.itemEditorHeight;
         private const EditorController.EditorSettings listItemSettingEnum = EditorController.EditorSettings.listItemHeight;
+        private const EditorController.EditorSettings sidePanelWidth= EditorController.EditorSettings.sidePanelWidth;
 
         #endregion
 
@@ -117,8 +118,6 @@ namespace ES_XML_Editor
             }
         }
 
-
-
         //list of indeces for all select items in Listbox
         private int[] listBoxSelectedItems
         {
@@ -166,18 +165,18 @@ namespace ES_XML_Editor
         {
             try
             {
-                String itemHeight = null;
+                String itemHeight = "";
                 contSettingHandler(editingItemSettingEnum, ref itemHeight);
-                itemEditorAreaResizer.Height = new GridLength(Convert.ToDouble(itemHeight));
+                itemEditorArea.Height = new GridLength(Convert.ToDouble(itemHeight));
             }
             catch
             {
-                itemEditorAreaResizer.Height = new GridLength(1.0, GridUnitType.Auto);
+                itemEditorArea.Height = new GridLength(1.0, GridUnitType.Auto);
             }
 
             try
             {
-                String listItemHeight = null;
+                String listItemHeight = "";
                 contSettingHandler(listItemSettingEnum, ref listItemHeight);
                 listItemHeightSlider.Value = Convert.ToDouble(listItemHeight);
             }
@@ -189,18 +188,6 @@ namespace ES_XML_Editor
             contBinder(ref dataViewSource);
             dataView = dataViewSource;
             
-
-            //itemEditorText2.Text = "None";
-            //try
-            //{
-            //    contBinder(ref windowListbox);
-            //    itemEditorText1.Text = "Selected Item Indeces: ";
-            //    itemEditorText2.Text = "None";
-            //}
-            //catch
-            //{
-            //    contErrorDisplayer("Error trying to bind to list in constructor.");
-            //}
             try
             {
                 itemEditorText1.Text = "Selected Item Indeces: ";
@@ -213,6 +200,23 @@ namespace ES_XML_Editor
             catch
             {
                 itemEditorText1.Text = "";
+            }
+
+            try
+            {
+                String sidePanelWidthString = "";
+                contSettingHandler(sidePanelWidth, ref sidePanelWidthString);
+                Double sidePanelWidthValue= Convert.ToDouble(sidePanelWidthString);
+                if (sidePanelWidthString != null && sidePanelWidthString != "")
+                {
+                    sidePanelArea.Width = new GridLength(sidePanelWidthValue);
+                    return;
+                }
+                sidePanelArea.Width = new GridLength(100.0, GridUnitType.Pixel);
+            }
+            catch
+            {
+                sidePanelArea.Width = new GridLength(100.0, GridUnitType.Pixel);
             }
         }
         /* ************************************************************************************************************************
@@ -259,11 +263,7 @@ namespace ES_XML_Editor
                 }
                 itemEditorHeading = temp;
             }
-            catch
-            {
-                //throw ex;
-                //contErrorDisplayer("Error!");
-            }
+            catch { }
         }
 
         /* ************************************************************************************************************************
@@ -288,23 +288,39 @@ namespace ES_XML_Editor
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        //public String currentFile()
-        //{
-        //    return currentFileFullPathLabel.Text;
-        //}
-
-        /* ************************************************************************************************************************
-         *************************************************************************************************************************/
         private void itemEditorResized(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             try
             {
-                String tempItemHeight = this.itemEditorAreaResizer.Height.Value.ToString();
+                //String tempItemHeight = (sender as RowDefinition).Width.Value.ToString();
+                if ((sender as RowDefinition).Equals(itemEditorArea))
+                {
+                    String tempItemHeight = this.itemEditorArea.Height.Value.ToString();
+                    contSettingHandler(editingItemSettingEnum, ref tempItemHeight);
+                }
+                else
+                {
+                    contErrorDisplayer("A RowDefinition other than itemEditorArea has somehow been resized");
+                }
+            }
+            catch { }
+        }
 
-                contSettingHandler(editingItemSettingEnum, ref tempItemHeight);
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        private void sidePanelResizedHandler(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            try
+            {
+                //String tempItemHeight = (sender as ColumnDefinition).Width.Value.ToString();
+                String tempSidePanelWidth = this.sidePanelArea.Width.Value.ToString();
+                contSettingHandler(sidePanelWidth, ref tempSidePanelWidth);
             }
             catch
             {
+                //contErrorDisplayer(sender.ToString());
+                //contErrorDisplayer(sidePanelArea.ToString());
+                contErrorDisplayer("Exception in MainWindow.sidePanelResizedHandler()");
             }
         }
 
@@ -317,9 +333,7 @@ namespace ES_XML_Editor
                 String temp = listItemHeightSlider.Value.ToString();
                 contSettingHandler(listItemSettingEnum, ref temp, true);
             }
-            catch
-            {
-            }
+            catch { }
         }
 
         /* ************************************************************************************************************************
@@ -341,15 +355,20 @@ namespace ES_XML_Editor
             String tempText = (e.Source as TextBox).Text;
         }
 
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
         private void saveFileButtonClicked(object sender, RoutedEventArgs e)
         {
             contFileSaver();
         }
 
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
         private void saveNewItemClick(object sender, RoutedEventArgs e)
         {
             contItemAdder(itemEditorData);
         }
 
+        
     }
 }

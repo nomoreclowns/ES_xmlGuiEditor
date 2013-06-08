@@ -10,6 +10,8 @@
         Height="350" Width="525" WindowStyle="ThreeDBorderWindow" Closing="closingWindow" WindowStartupLocation="CenterScreen" ShowInTaskbar="False" ScrollViewer.CanContentScroll="True" MinWidth="425" MinHeight="350" SizeChanged="windowResized">
     <Window.Resources>
 
+        <!-- xaml for setting binding diagnostics= , diagnostics:PresentationTraceSources.TraceLevel=High -->
+        
         <DataTemplate x:Key="xmlListItemTemplate">
             <DataTemplate.Resources>
                 <DataTemplate x:Key="attributeTemplate" DataType="{x:Type ESXE:xmlAttribute}">
@@ -83,24 +85,18 @@
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition />
                                 </Grid.RowDefinitions>
                                 <WrapPanel Orientation="Horizontal">
-                                        <ItemsControl ItemsSource="{Binding Path=lonelyElements}" ItemTemplate="{StaticResource lonelyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                        <ItemsControl ItemsSource="{Binding Path=lonelyElements}" ItemTemplate="{StaticResource lonelyElement}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
                                                     <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
                                                 </ItemsPanelTemplate>
                                             </ItemsControl.ItemsPanel>
                                         </ItemsControl>
-                                        <ItemsControl ItemsSource="{Binding Path=dummyElements}" ItemTemplate="{StaticResource dummyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
-                                            <ItemsControl.ItemsPanel>
-                                                <ItemsPanelTemplate>
-                                                    <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
-                                                </ItemsPanelTemplate>
-                                            </ItemsControl.ItemsPanel>
-                                        </ItemsControl>
-                                        <ItemsControl ItemsSource="{Binding Path=AttributeElements}" ItemTemplate="{StaticResource semiLonelyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                        <ItemsControl ItemsSource="{Binding Path=dummyElements}" ItemTemplate="{StaticResource dummyElement}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
                                                     <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
@@ -108,10 +104,17 @@
                                             </ItemsControl.ItemsPanel>
                                         </ItemsControl>
                                 </WrapPanel>
-                                <ItemsControl ItemsSource="{Binding Path=xmlAttributes}" ItemTemplate="{StaticResource attributeTemplate}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0" Grid.Row="1">
+                                <ItemsControl ItemsSource="{Binding Path=AttributeElements}" ItemTemplate="{StaticResource semiLonelyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0" Grid.Row="1">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                                <ItemsControl ItemsSource="{Binding Path=xmlAttributes}" ItemTemplate="{StaticResource attributeTemplate}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0" Grid.Row="2">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel IsItemsHost="True" Orientation="Vertical" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                 </ItemsControl>
@@ -151,7 +154,7 @@
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                         </ItemsControl>
-                        <WrapPanel Orientation="Horizontal" Grid.Row="2">
+                        <WrapPanel Orientation="Vertical" Grid.Row="2">
                             <ItemsControl ItemsSource="{Binding Path=dummyElements}" ItemTemplate="{StaticResource dummyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -166,7 +169,7 @@
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
-                            <ItemsControl ItemsSource="{Binding Path=childRearingElements}" ItemTemplate="{StaticResource ProcreatingElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                            <ItemsControl ItemsSource="{Binding Path=childRearingElements}" ItemTemplate="{StaticResource ProcreatingElement}" VerticalAlignment="Top" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0" HorizontalAlignment="Left">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel IsItemsHost="True" Orientation="Horizontal"/>
@@ -181,13 +184,11 @@
 
         <DataTemplate x:Key="viewerTemplate">
             <DataTemplate.Resources>
-
-
                 <DataTemplate x:Key="viewerAttributeTemplate" DataType="{x:Type ESXE:xmlAttrib}">
                     <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal">
                         <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center" Margin="2,2,0,2"/>
                         <TextBlock Text="= " VerticalAlignment="Center" Margin="0,2"/>
-                        <TextBox HorizontalAlignment="Left" Text="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, diagnostics:PresentationTraceSources.TraceLevel=High}" VerticalAlignment="Top" Margin="0,0,0,1" MaxLines="1" UndoLimit="5" Padding="0,-1" MinHeight="0" VerticalContentAlignment="Bottom" TextChanged="viewerItemTextChanged"/>
+                        <TextBox HorizontalAlignment="Left" Text="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Margin="0,0,0,1" MaxLines="1" UndoLimit="5" Padding="0,-1" MinHeight="0" VerticalContentAlignment="Bottom" TextChanged="viewerItemTextChanged"/>
                     </StackPanel>
                 </DataTemplate>
 
@@ -195,7 +196,7 @@
                     <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal">
                         <TextBlock HorizontalAlignment="Left" Text="{Binding Path=Name}" VerticalAlignment="Center" Margin="2,2,0,2"/>
                         <TextBlock HorizontalAlignment="Left" Text=":: " VerticalAlignment="Center" Margin="0,2"/>
-                        <TextBox HorizontalAlignment="Left" Text="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, diagnostics:PresentationTraceSources.TraceLevel=High}" VerticalAlignment="Center" Margin="0,1" VerticalContentAlignment="Bottom"/>
+                        <TextBox HorizontalAlignment="Left" Text="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Margin="0,1" VerticalContentAlignment="Bottom"/>
                     </StackPanel>
                 </DataTemplate>
 
@@ -289,10 +290,8 @@
                         </Grid>
                     </GroupBox>
                 </DataTemplate>
-
             </DataTemplate.Resources>
-
-
+            
             <Grid Width="Auto" Height="Auto">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -349,13 +348,13 @@
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="100"/>
+            <ColumnDefinition x:Name="sidePanelArea" MinWidth="0.01"/>
             <ColumnDefinition Width="488*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
-            <RowDefinition x:Name="itemEditorAreaResizer"/>
+            <RowDefinition x:Name="itemEditorArea"/>
         </Grid.RowDefinitions>
         <ListBox ItemTemplate="{StaticResource xmlListItemTemplate}" x:Name="windowListbox" Grid.Row="1" Background="#FFE6E6E6" SelectionChanged="windowListBoxSelectionChanged" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Auto" Padding="5,0,10,0" ScrollViewer.CanContentScroll="False" Grid.Column="1" IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding dataView, ElementName=PrimaryWindow, Mode=OneWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}">
             <ListBox.ItemsPanel>
@@ -375,7 +374,7 @@
             <Slider x:Name="listItemHeightSlider" Maximum="500" Minimum="100" SmallChange="10" TickPlacement="Both" TickFrequency="50" LargeChange="100" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" Width="100" Foreground="Black" DockPanel.Dock="Right" ValueChanged="itemHeightSliderValueChanged"/>
             <Button Content="Save File" HorizontalAlignment="Left" Click="saveFileButtonClicked"/>
         </DockPanel>
-        <Grid x:Name="itemEditorArea" Grid.Column="1" Grid.Row="2" Background="#FFE6E6E6" >
+        <Grid x:Name="itemEditorPanel" Grid.Column="1" Grid.Row="2" Background="#FFE6E6E6" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="99*"/>
@@ -391,13 +390,18 @@
                 <Button Content="Save as New Item" Click="saveNewItemClick"/>
             </StackPanel>
         </Grid>
-        <GridSplitter Grid.Row="1" Width="5" ResizeDirection="Columns" Grid.RowSpan="2"/>
+        <GridSplitter Grid.Row="1" Width="5" ResizeDirection="Columns" Grid.RowSpan="2" DragCompleted="sidePanelResizedHandler"/>
         <GridSplitter Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Grid.Row="2" Grid.Column="1" DragCompleted="itemEditorResized"/>
-        <TabControl Margin="0,0,5,0" Grid.Row="1" Grid.RowSpan="2" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+        <TabControl x:Name="sidePanel" Margin="0,0,5,0" Grid.Row="1" Grid.RowSpan="2" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
             <TabItem Header="Debug Text">
-                <Grid Background="#FFE5E5E5">
+                <ScrollViewer Background="#FFE5E5E5" VerticalScrollBarVisibility="Auto">
                     <TextBlock x:Name="debugWindow" TextWrapping="Wrap"/>
-                </Grid>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Working Directory">
+                <ScrollViewer Background="#FFE5E5E5" VerticalScrollBarVisibility="Auto">
+                    <TextBlock x:Name="FileWindow" TextWrapping="Wrap"/>
+                </ScrollViewer>
             </TabItem>
         </TabControl>
     </Grid>

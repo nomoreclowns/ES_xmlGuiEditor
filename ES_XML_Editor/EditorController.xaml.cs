@@ -117,6 +117,17 @@ namespace ES_XML_Editor
     /// </summary>
     public partial class EditorController : Window, INotifyPropertyChanged
     {
+        public enum EditorSettings
+        {
+            lastDirectoryOpened,
+            lastFileOpened,
+            listItemHeight,
+            itemEditorHeight,
+            sidePanelWidth,
+            editingWindowHeight,
+            editingWindowWidth
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(String name)
@@ -129,12 +140,30 @@ namespace ES_XML_Editor
             }
         }
 
+        #region membersSettersAndGetters
+
         // Shortcut variable for quicker access to the .settings file
         private static ProgramSettings embeddedSettings = ProgramSettings.Default;
 
         // list that stores the contents of a file
         private xmlElem dataContainerSource;
 
+        // folder where program places important files (like user settings file)
+        private String ProgramStoringFolder;
+
+        private String userSettingsFilePath;
+
+        // Manager for the users' settings file
+        private KeyValuePairDataBase userSettings;
+
+        //instance of the base window
+        private MainWindow baseWindowObject;
+
+        // the current "view" of the list
+        private CollectionView dataContainerView;
+
+        private FileHandler currentFile;
+        
         public xmlElem dataContainer
         {
             set
@@ -151,40 +180,15 @@ namespace ES_XML_Editor
             }
         }
 
-        // the current "view" of the list
-        private CollectionView dataContainerView;
-
-        // current opened file
-        //private String lastXmlFileOpened;
-
-        private FileHandler currentFile;
-
-        // folder where program places important files (like user settings file)
-        private String ProgramStoringFolder;
-
-        private String userSettingsFilePath;
-
-        // Manager for the users' settings file
-        private KeyValuePairDataBase userSettings;
-
-        // String to hold the users' last visited directory when using this program.
-        // Eventually gets stored as a setting in a file
-        //private String workingDirectory;
-
-        //instance of the base window
-        private MainWindow baseWindowObject;
-
+        #endregion
 
         //default constructor
         public EditorController()
         {
             InitializeComponent();
 
-            ProgramStoringFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), embeddedSettings.progName);
 
-            userSettingsFilePath = System.IO.Path.Combine(ProgramStoringFolder, embeddedSettings.settingsFileName);
-
-            retrieveSettingsFile(ProgramStoringFolder);
+            retrieveSettingsFile();
 
             String workingDirectory = userSettings.getValue(EditorSettings.lastDirectoryOpened.ToString());
             
@@ -195,7 +199,6 @@ namespace ES_XML_Editor
 
                 dataContainerSource = new xmlElem(currentFile.open());
                 dataContainerView = (CollectionView)CollectionViewSource.GetDefaultView(dataContainerSource.xmlElements);
-
             }
             catch
             {
@@ -209,27 +212,7 @@ namespace ES_XML_Editor
                 }
             }
 
-            controllerDelegateContainer tempItem1= new controllerDelegateContainer(showErrorMessage, closeProgram);
-            controllerDataDelegateContainer tempItem2= new controllerDataDelegateContainer(bindFunction, selectData, addData, editData);
-            controllerMiscDelegateContainer tempItem3= new controllerMiscDelegateContainer(openFile, setOrGetSetting, saveData);
-
-            Double height= Convert.ToDouble(userSettings.getValue(EditorSettings.editingWindowHeight.ToString()));
-            Double width = Convert.ToDouble(userSettings.getValue(EditorSettings.editingWindowWidth.ToString()));
-
-            baseWindowObject = new MainWindow(tempItem1, tempItem2, tempItem3);
-
-            try
-            {
-                baseWindowObject.Height = height;
-                baseWindowObject.Width = width;
-            }
-            catch
-            {
-
-            }
-            baseWindowObject.optionalInitialSetup();
-
-            baseWindowObject.Show();
+            showPrimaryWindow();
         }
 
         #region delegateFunctions
@@ -371,12 +354,51 @@ namespace ES_XML_Editor
 
         #region nonDelegateFunctions
 
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        protected void retrieveSettingsFile()
+        {
+            ProgramStoringFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), embeddedSettings.progName);
+
+            userSettingsFilePath = System.IO.Path.Combine(ProgramStoringFolder, embeddedSettings.settingsFileName);
+            try
+            {
+                userSettings = new KeyValuePairDataBase(userSettingsFilePath);
+            }
+            catch
+            {
+                userSettings = new KeyValuePairDataBase();
+            }
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        protected void showPrimaryWindow()
+        {
+            controllerDelegateContainer tempItem1 = new controllerDelegateContainer(showErrorMessage, closeProgram);
+            controllerDataDelegateContainer tempItem2 = new controllerDataDelegateContainer(bindFunction, selectData, addData, editData);
+            controllerMiscDelegateContainer tempItem3 = new controllerMiscDelegateContainer(openFile, setOrGetSetting, saveData);
+
+            Double height = Convert.ToDouble(userSettings.getValue(EditorSettings.editingWindowHeight.ToString()));
+            Double width = Convert.ToDouble(userSettings.getValue(EditorSettings.editingWindowWidth.ToString()));
+
+            baseWindowObject = new MainWindow(tempItem1, tempItem2, tempItem3);
+            try
+            {
+                baseWindowObject.Height = height;
+                baseWindowObject.Width = width;
+            }
+            catch { }
+
+            baseWindowObject.optionalInitialSetup();
+            baseWindowObject.Show();
+        }
+        
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
         protected void openFileChooser(out String fileName, out String directory)
         {
-            
-
             OpenFileDialog fileChooser = new OpenFileDialog();
 
             fileChooser.Multiselect = false;
@@ -420,9 +442,7 @@ namespace ES_XML_Editor
                 {
                     temp.Add(recuresiveElementCloner(item));
                 }
-                catch
-                {
-                }
+                catch { }
             }
             return temp;
         }
@@ -446,36 +466,16 @@ namespace ES_XML_Editor
         }
 
         /* ************************************************************************************************************************
+         * event handler for when this window(program) recieves focus
          *************************************************************************************************************************/
-        protected void retrieveSettingsFile(String folderPath)
+        protected void programActivated(object sender, EventArgs e)
         {
-            String settingsPath = System.IO.Path.Combine(ProgramStoringFolder, "settings.xml");
-            try
-            {
-                userSettings = new KeyValuePairDataBase(settingsPath);
-            }
-            catch
-            {
-                userSettings= new KeyValuePairDataBase();
-            }
+            //redirect focus to primary window for now
+            baseWindowObject.Activate();
         }
 
         #endregion
 
-        public enum EditorSettings
-        {
-            lastDirectoryOpened,
-            lastFileOpened,
-            listItemHeight,
-            itemEditorHeight,
-            editingWindowHeight,
-            editingWindowWidth
-        }
-
-        private void programActivated(object sender, EventArgs e)
-        {
-            baseWindowObject.Activate();
-        }
     }//end of class
 
 }
