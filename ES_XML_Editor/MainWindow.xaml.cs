@@ -268,12 +268,12 @@ namespace ES_XML_Editor
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        private void listBoxSourceUpdatedHandler(object sender, DataTransferEventArgs e)
-        {
-            contErrorDisplayer("listBox source updated");
-            //controllerReference.saveData();
-            contFileSaver();
-        }
+        //private void listBoxSourceUpdatedHandler(object sender, DataTransferEventArgs e)
+        //{
+        //    contErrorDisplayer("listBox source updated");
+        //    //controllerReference.saveData();
+        //    contFileSaver();
+        //}
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
@@ -339,6 +339,16 @@ namespace ES_XML_Editor
             String tempObject = e.Source.ToString();
 
             String tempText = (e.Source as TextBox).Text;
+        }
+
+        private void saveFileButtonClicked(object sender, RoutedEventArgs e)
+        {
+            contFileSaver();
+        }
+
+        private void saveNewItemClick(object sender, RoutedEventArgs e)
+        {
+            contItemAdder(itemEditorData);
         }
 
     }

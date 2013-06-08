@@ -92,7 +92,19 @@ namespace ES_XML_Editor
 
         public override string ToString()
         {
-            String temp = Name + "=\"" + Value + "\"";
+            String temp = Name.ToString();
+            if (Name.Namespace == XNamespace.Xmlns)
+            {
+                temp = "xmlns:" + (Name.LocalName) + "=\"" + Value + "\"";
+                return temp;
+            }
+
+            //if (Name.Namespace != null || Name.Namespace != "")
+            //{
+            //    temp = "xmlns:" + (Name.LocalName) + "=\"" + Value + "\"";
+            //    return temp;
+            //}
+            temp = Name + "=\"" + Value + "\"";
             return temp;
         }
     }
@@ -167,7 +179,7 @@ namespace ES_XML_Editor
         {
             set
             {
-                this.elementValue = value;
+                this.elementValue = value.Trim();
                 OnPropertyChanged("Value");
             }
             get
@@ -545,6 +557,8 @@ namespace ES_XML_Editor
 
         #endregion
 
+        #region functions
+
         public xmlAttrib Attribute(String attrName)
         {
 
@@ -573,10 +587,6 @@ namespace ES_XML_Editor
             pElements.Add(child);
         }
 
-        //public void Remove()
-        //{
-        //}
-
         public void Remove(xmlElem child)
         {
             pElements.Remove(child);
@@ -584,7 +594,7 @@ namespace ES_XML_Editor
 
         public override string ToString()
         {
-            String temp = "<" + elementName;
+            String temp = "\n<" + elementName;
             if (HasAttributes == true)
             {
                 foreach (xmlAttrib attr in pAttributes)
@@ -596,25 +606,25 @@ namespace ES_XML_Editor
 
             if (HasElements == true)
             {
-                temp += "\n";
+                temp += "";
                 if (elementValue != "" && elementName != null)
                 {
-                    temp += elementValue + "\n";
+                    temp += elementValue;
                 }
                 foreach (xmlElem item in pElements)
                 {
-                    temp += item.ToString() + "\n";
+                    temp += item.ToString() + "";
                 }
-                temp += "</" + elementName + ">\n";
+                temp += "\n</" + elementName + ">";
                 return temp;
             }
             else
             {
-                if (elementName != "" && elementName != null)
+                if (elementName != null && elementName != "")
                 {
-                    temp += elementValue + "\n";
+                    temp += elementValue;
                 }
-                temp += @"</" + elementName + ">\n";
+                temp += "</" + elementName + ">";
                 return temp;
             }
         }
@@ -678,6 +688,7 @@ namespace ES_XML_Editor
             return false;
         }
 
+        #endregion
     }
 
     public class xmlDoc
@@ -720,21 +731,29 @@ namespace ES_XML_Editor
         public xmlDoc()
         {
             xmlDeclaration = new XDeclaration("1.0", "utf-8", "yes");
+
+            rootElem = new xmlElem();
         }
 
         public xmlDoc(XDeclaration dec)
         {
             xmlDeclaration = new XDeclaration(dec);
+
+            rootElem = new xmlElem();
         }
 
         public xmlDoc(xmlDoc source)
         {
             xmlDeclaration = new XDeclaration(source.xmlDeclaration);
+
+            rootElem = new xmlElem(source.root);
         }
 
         public xmlDoc(XDocument source)
         {
             xmlDeclaration = new XDeclaration(source.Declaration);
+
+            rootElem = new xmlElem(source.Root);
         }
 
         #endregion
@@ -753,18 +772,6 @@ namespace ES_XML_Editor
             return temp;
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     public class xmlAttribute : XAttribute, INotifyPropertyChanged
@@ -844,7 +851,6 @@ namespace ES_XML_Editor
 
         public DataElement(String xmlName) : base(xmlName) { }
     }
-
 
     public class WrapperElement : XElement, INotifyPropertyChanged
     {
@@ -954,19 +960,6 @@ namespace ES_XML_Editor
                 return this.Name;
             }
         }
-
-        //public String ElementValue
-        //{
-        //    set
-        //    {
-        //        this.Value = value;
-        //        OnPropertyChanged("ElementValue");
-        //    }
-        //    get
-        //    {
-        //        return this.Value;
-        //    }
-        //}
 
         public ObservableCollection<xmlAttribute> xmlAttributes
         {
@@ -1114,7 +1107,7 @@ namespace ES_XML_Editor
 
         public xmlElement firstChildByAttrValue(XName attrName, String attrValue)
         {
-            List<xmlElement> tempList= ElementList();
+            List<xmlElement> tempList = ElementList();
 
             for (int i = 0; i < tempList.Count; i++)
             {
@@ -1192,7 +1185,7 @@ namespace ES_XML_Editor
             }
             else if (this.HasElements == true)
             {
-                foreach(xmlElement item in xmlElements)
+                foreach (xmlElement item in xmlElements)
                 {
                     item.setAttribute(attrName, attrValue);
                 }

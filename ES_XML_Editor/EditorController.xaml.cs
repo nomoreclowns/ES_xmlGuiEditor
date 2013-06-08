@@ -295,6 +295,7 @@ namespace ES_XML_Editor
         protected void addData(xmlElem source)
         {
             dataContainerSource.Add(source);
+            OnPropertyChanged("dataContainer");
         }
 
         /* ************************************************************************************************************************
@@ -347,7 +348,8 @@ namespace ES_XML_Editor
          *************************************************************************************************************************/
         protected void saveData()
         {
-            
+            //showErrorMessage(dataContainerSource.ToString());
+            currentFile.save();
         }
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
@@ -356,7 +358,7 @@ namespace ES_XML_Editor
             try
             {
                 saveSettings();
-                saveData();
+                //saveData();
                 this.Close();
             }
             catch (InvalidOperationException)
