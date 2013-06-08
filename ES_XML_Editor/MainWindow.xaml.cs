@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,14 +13,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Diagnostics;
 
 namespace ES_XML_Editor
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        #region delegateRegion
+
         private controllerOpenFile contFileOpener;
         private controllerBind contBinder;
         private controllerShowError contErrorDisplayer;
@@ -27,37 +31,95 @@ namespace ES_XML_Editor
         private controllerClose contProgramCloser;
         private controllerGetSelectedData contDataGetter;
         private controllerManipulateSetting contSettingHandler;
+        private controllerAddItem contItemAdder;
+        private controllerEditItem contItemEditor;
 
-        private xmlElement editingItem;
+        #endregion
 
-        /* ************************************************************************************************************************
-         *************************************************************************************************************************/
-        //public MainWindow(EditorController owner)
-        //{
-        //    InitializeComponent();
+        #region enumSettingInstaces
 
-        //    if (owner == null)
-        //    {
-        //        throw new NullReferenceException("MainWindow Constructor cannot have a null reference to program controller");
-        //    }
-        //    controllerReference = owner;
+        private const EditorController.EditorSettings heightSettingEnum = EditorController.EditorSettings.editingWindowHeight;
+        private const EditorController.EditorSettings widthSettingEnum = EditorController.EditorSettings.editingWindowWidth;
+        private const EditorController.EditorSettings editingItemSettingEnum = EditorController.EditorSettings.itemEditorHeight;
+        private const EditorController.EditorSettings listItemSettingEnum = EditorController.EditorSettings.listItemHeight;
 
-        //}
+        #endregion
 
-        public MainWindow(controllerDelegateContainer editorFunctions)
+        #region INotifyPropertyChangedArea
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(String name)
         {
-            InitializeComponent();
+            PropertyChangedEventHandler changedHandler = PropertyChanged;
 
-            if (editorFunctions == null)
+            if (changedHandler != null)
             {
-                throw new NullReferenceException("MainWindow Constructor cannot have a null reference to editorFunctions");
+                changedHandler(this, new PropertyChangedEventArgs(name));
             }
-            editorFunctions.retrieveDelegates(out contErrorDisplayer, out contFileOpener, out contBinder, out contDataGetter, out contSettingHandler, out contFileSaver, out contProgramCloser);
-
         }
 
-        /* ************************************************************************************************************************
-         *************************************************************************************************************************/
+        #endregion
+
+        private String itemEditorHeadingString= "";
+
+        public String itemEditorHeading
+        {
+            set
+            {
+                if (value != null)
+                {
+                    itemEditorHeadingString = value;
+                    OnPropertyChanged("itemEditorHeading");
+                }
+            }
+            get
+            {
+                return itemEditorHeadingString;
+            }
+        }
+
+        private xmlElem itemEditorDataElement;
+
+        public xmlElem itemEditorData
+        {
+            set
+            {
+                itemEditorDataElement = value;
+                OnPropertyChanged("itemEditorData");
+                //if (value != null)
+                //{
+                //    itemEditorDataElement = value;
+                //    OnPropertyChanged("itemEditorData");
+                //}
+            }
+            get
+            {
+                return itemEditorDataElement;
+            }
+        }
+
+        private CollectionView dataViewSource;
+
+        public CollectionView dataView
+        {
+            set
+            {
+                if (value != null)
+                {
+                    dataViewSource = value;
+                    OnPropertyChanged("dataView");
+                }
+            }
+            get
+            {
+                return dataViewSource;
+            }
+        }
+
+
+
+        //list of indeces for all select items in Listbox
         private int[] listBoxSelectedItems
         {
             get
@@ -78,6 +140,81 @@ namespace ES_XML_Editor
             }
         }
 
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        public MainWindow(controllerDelegateContainer editorFunctions, controllerDataDelegateContainer editorDataFunctions, controllerMiscDelegateContainer editorMiscFunctions)
+        {
+            InitializeComponent();
+
+            if (editorFunctions == null)
+            {
+                throw new NullReferenceException("MainWindow Constructor cannot have a null references to editorFunctions, editorDataFunctions, or editorMiscFunctions");
+            }
+            editorFunctions.retrieveDelegates(out contErrorDisplayer, out contProgramCloser);
+            editorDataFunctions.retrieveDelegates(out contBinder, out contDataGetter, out contItemAdder, out contItemEditor);
+            editorMiscFunctions.retrieveDelegates(out contFileOpener, out contSettingHandler, out contFileSaver);
+
+            //windowListbox.ItemsSource = dataView;
+
+            itemEditorDataElement = new xmlElem();
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        public void optionalInitialSetup()
+        {
+            try
+            {
+                String itemHeight = null;
+                contSettingHandler(editingItemSettingEnum, ref itemHeight);
+                itemEditorAreaResizer.Height = new GridLength(Convert.ToDouble(itemHeight));
+            }
+            catch
+            {
+                itemEditorAreaResizer.Height = new GridLength(1.0, GridUnitType.Auto);
+            }
+
+            try
+            {
+                String listItemHeight = null;
+                contSettingHandler(listItemSettingEnum, ref listItemHeight);
+                listItemHeightSlider.Value = Convert.ToDouble(listItemHeight);
+            }
+            catch
+            {
+                listItemHeightSlider.Value = listItemHeightSlider.Minimum;
+            }
+
+            contBinder(ref dataViewSource);
+            dataView = dataViewSource;
+            
+
+            //itemEditorText2.Text = "None";
+            //try
+            //{
+            //    contBinder(ref windowListbox);
+            //    itemEditorText1.Text = "Selected Item Indeces: ";
+            //    itemEditorText2.Text = "None";
+            //}
+            //catch
+            //{
+            //    contErrorDisplayer("Error trying to bind to list in constructor.");
+            //}
+            try
+            {
+                itemEditorText1.Text = "Selected Item Indeces: ";
+                Binding myBinding = new Binding("itemEditorData");
+                myBinding.Mode = BindingMode.TwoWay;
+                myBinding.ElementName = "PrimaryWindow";
+                myBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+                listBoxItemViewer.SetBinding(ScrollViewer.ContentProperty, myBinding);
+            }
+            catch
+            {
+                itemEditorText1.Text = "";
+            }
+        }
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
         private void closingWindow(object sender, System.ComponentModel.CancelEventArgs e)
@@ -89,16 +226,13 @@ namespace ES_XML_Editor
          *************************************************************************************************************************/
         private void openFileButtonClick(object sender, RoutedEventArgs e)
         {
-            String theFile;
+            contFileOpener();
 
-            String fullPath;
+            contBinder(ref dataViewSource);
+            dataView = dataViewSource;
 
-            contFileOpener(out theFile, out fullPath);
-            
-            contBinder(ref windowListbox);
-
-            //currentFileLabel.Text = theFile;
-            //currentFileFullPathLabel.Text = fullPath;
+            itemEditorText1.Text = "Selected Item Indeces: ";
+            //itemEditorText2.Text = "None";
         }
 
         /* ************************************************************************************************************************
@@ -107,11 +241,28 @@ namespace ES_XML_Editor
         {
             try
             {
-                contDataGetter(listBoxSelectedItems, ref editingItem);
+                xmlElem tempElement = null;
+                contDataGetter(listBoxSelectedItems, ref itemEditorDataElement);
+                itemEditorData = itemEditorDataElement;
+                //listBoxItemViewer.Content = itemEditorData;
+                debugWindow.Text = itemEditorData.ToString();
+                //Binding myBinding = new Binding("itemEditorData");
+                //myBinding.Mode = BindingMode.TwoWay;
+                //myBinding.ElementName = "PrimaryWindow";
+                //myBinding.Path = new PropertyPath(itemEditorData);
+                //listBoxItemViewer.SetBinding(ScrollViewer.ContentProperty, myBinding);
+
+                String temp = "";
+                foreach (int index in listBoxSelectedItems)
+                {
+                    temp += index.ToString() + ", ";
+                }
+                itemEditorHeading = temp;
             }
             catch
             {
-                //currentFileLabel.Text = "Error";
+                //throw ex;
+                //contErrorDisplayer("Error!");
             }
         }
 
@@ -119,18 +270,73 @@ namespace ES_XML_Editor
          *************************************************************************************************************************/
         private void listBoxSourceUpdatedHandler(object sender, DataTransferEventArgs e)
         {
+            contErrorDisplayer("listBox source updated");
             //controllerReference.saveData();
             contFileSaver();
         }
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        public String currentFile()
+        private void windowResized(object sender, SizeChangedEventArgs e)
         {
-            return currentFileFullPathLabel.Text;
+            String tempHeight = this.Height.ToString();
+            String tempWidth = this.Width.ToString();
+
+            contSettingHandler(heightSettingEnum, ref tempHeight);
+            contSettingHandler(widthSettingEnum, ref tempWidth);
         }
 
-        
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        //public String currentFile()
+        //{
+        //    return currentFileFullPathLabel.Text;
+        //}
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        private void itemEditorResized(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            try
+            {
+                String tempItemHeight = this.itemEditorAreaResizer.Height.Value.ToString();
+
+                contSettingHandler(editingItemSettingEnum, ref tempItemHeight);
+            }
+            catch
+            {
+            }
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        private void itemHeightSliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            try
+            {
+                String temp = listItemHeightSlider.Value.ToString();
+                contSettingHandler(listItemSettingEnum, ref temp, true);
+            }
+            catch
+            {
+            }
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        private void saveItem(object sender, RoutedEventArgs e)
+        {
+            contItemEditor(this.itemEditorData, this.listBoxSelectedItems);
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        private void viewerItemTextChanged(object sender, TextChangedEventArgs e)
+        {
+            String tempObject = e.Source.ToString();
+
+            String tempText = (e.Source as TextBox).Text;
+        }
 
     }
 }

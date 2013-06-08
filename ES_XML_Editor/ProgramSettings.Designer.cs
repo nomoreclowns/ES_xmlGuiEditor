@@ -46,5 +46,17 @@ namespace ES_XML_Editor {
                 this["xmlRootElementName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("settings.xml")]
+        public string settingsFileName {
+            get {
+                return ((string)(this["settingsFileName"]));
+            }
+            set {
+                this["settingsFileName"] = value;
+            }
+        }
     }
 }

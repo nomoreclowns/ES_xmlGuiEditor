@@ -1,7 +1,7 @@
 ﻿<Window x:Class="ES_XML_Editor.EditorController"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="EditorController" Height="300" Width="300" ShowActivated="False" Focusable="False" IsHitTestVisible="False" Opacity="0" AllowsTransparency="True" WindowStyle="None">
+        Title="EditorController" Height="300" Width="300" ShowActivated="False" Focusable="False" IsHitTestVisible="False" Opacity="0" AllowsTransparency="True" WindowStyle="None" Activated="programActivated">
     <Grid>
     	<ListBox HorizontalAlignment="Left" Height="100" Style="{DynamicResource SimpleListBox}" VerticalAlignment="Top" Width="100"/>
         

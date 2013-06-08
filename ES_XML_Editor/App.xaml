@@ -14,6 +14,119 @@
     		<ResourceDictionary.MergedDictionaries>
     			<ResourceDictionary Source="Simple Styles.xaml"/>
     		</ResourceDictionary.MergedDictionaries>
+
+            <!--
+        <DataTemplate x:Key="viewerTemplate">
+            <GroupBox VerticalAlignment="Top">
+                <GroupBox.Resources>
+
+                    <DataTemplate DataType="{x:Type ESXE:xmlAttribute}">
+                        <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal">
+                            <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center"/>
+                            <TextBlock Text=": " VerticalAlignment="Center"/>
+                            <TextBox HorizontalAlignment="Left" Text="{Binding Path=Value}" VerticalAlignment="Top"/>
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="lonelyElement" DataType="{x:Type ESXE:DataElement}">
+                        <GroupBox Header="{Binding Path=Name}" VerticalAlignment="Top">
+                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal">
+                                <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=xmlAttributes}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                                <TextBox HorizontalAlignment="Left" Text="{Binding Path=Value}" VerticalAlignment="Top"/>
+                            </StackPanel>
+                        </GroupBox>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="ProcreatingElement" DataType="{x:Type ESXE:xmlElement}">
+                        <GroupBox Header="{Binding Path=Name}" VerticalAlignment="Top">
+                            <GroupBox.Resources>
+                                <DataTemplate x:Key="subSingleElement" DataType="{x:Type ESXE:xmlElement}">
+                                    <GroupBox Header="{Binding Path=Name}" VerticalAlignment="Top">
+                                        <WrapPanel Orientation="Horizontal">
+                                            <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=xmlAttributes}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                            </ItemsControl>
+                                            <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=lonelyElements}" ItemTemplate="{StaticResource lonelyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                            </ItemsControl>
+                                        </WrapPanel>
+                                    </GroupBox>
+                                </DataTemplate>
+                            </GroupBox.Resources>
+                            <WrapPanel Orientation="Horizontal">
+                                <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=xmlAttributes}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                                <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=lonelyElements}" ItemTemplate="{StaticResource lonelyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                                <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=childRearingElements}" ItemTemplate="{StaticResource subSingleElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </WrapPanel>
+                        </GroupBox>
+                    </DataTemplate>
+
+                </GroupBox.Resources>
+                <GroupBox.Header>
+                    <TextBlock HorizontalAlignment="Left" Text="{Binding Path=Attribute[Name].Value, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Height="23" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                </GroupBox.Header>
+                <GroupBox Header="{Binding Path=Name}" VerticalAlignment="Top">
+                    <WrapPanel Orientation="Horizontal">
+
+                        <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=xmlAttributes}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0"  >
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                        <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=lonelyElements}" ItemTemplate="{StaticResource lonelyElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0"  >
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True" Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                        <ItemsControl Background="#FFE6E6E6" ItemsSource="{Binding Path=childRearingElements}" ItemTemplate="{StaticResource ProcreatingElement}" VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0"  >
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True" Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </WrapPanel>
+                </GroupBox>
+            </GroupBox>
+        </DataTemplate>
+        -->
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

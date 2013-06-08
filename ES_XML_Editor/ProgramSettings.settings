@@ -8,5 +8,8 @@
     <Setting Name="xmlRootElementName" Type="System.String" Scope="User">
       <Value Profile="(Default)">Datatable</Value>
     </Setting>
+    <Setting Name="settingsFileName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">settings.xml</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
