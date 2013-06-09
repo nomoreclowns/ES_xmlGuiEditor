@@ -366,7 +366,16 @@ namespace ES_XML_Editor
          *************************************************************************************************************************/
         private void saveNewItemClick(object sender, RoutedEventArgs e)
         {
-            contItemAdder(itemEditorData);
+            int listIndex= windowListbox.Items.Count;
+            try
+            {
+                contItemAdder(itemEditorData);
+                contBinder(ref dataViewSource);
+                dataView = dataViewSource;
+
+                windowListbox.SelectedItem = windowListbox.Items[listIndex];
+            }
+            catch { }
         }
 
         
