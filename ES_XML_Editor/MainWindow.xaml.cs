@@ -340,10 +340,14 @@ namespace ES_XML_Editor
          *************************************************************************************************************************/
         private void saveItem(object sender, RoutedEventArgs e)
         {
+            int tempIndex = windowListbox.SelectedIndex;
+
             contItemEditor(this.itemEditorData, this.listBoxSelectedItems);
 
             contBinder(ref dataViewSource);
             dataView = dataViewSource;
+
+            windowListbox.SelectedIndex = tempIndex;
         }
 
         /* ************************************************************************************************************************

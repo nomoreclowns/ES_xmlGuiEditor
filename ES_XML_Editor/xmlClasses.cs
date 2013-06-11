@@ -181,6 +181,17 @@ namespace ES_XML_Editor
             {
                 this.elementValue = value.Trim();
                 OnPropertyChanged("Value");
+                if (Parent != null)
+                {
+                    Parent.OnPropertyChanged("Elements");
+                    Parent.OnPropertyChanged("onlyChildDataElement");
+                    Parent.OnPropertyChanged("onlyChildAttributeElement");
+                    Parent.OnPropertyChanged("childRearingElements");
+                    Parent.OnPropertyChanged("dummyElements");
+                    Parent.OnPropertyChanged("lonelyElements");
+                    Parent.OnPropertyChanged("AttributeElements");
+                    Parent.OnPropertyChanged("xmlElements");
+                }
             }
             get
             {
@@ -206,6 +217,10 @@ namespace ES_XML_Editor
 
         public xmlElem onlyChildDataElement
         {
+            set
+            {
+                OnPropertyChanged("onlyChildDataElement");
+            }
             get
             {
                 if (Elements.Count == 1)
@@ -221,6 +236,10 @@ namespace ES_XML_Editor
 
         public xmlElem onlyChildAttributeElement
         {
+            set
+            {
+                OnPropertyChanged("onlyChildAttributeElement");
+            }
             get
             {
                 if (Elements.Count == 1)
@@ -240,6 +259,10 @@ namespace ES_XML_Editor
             {
                 if (value != null)
                 {
+                    foreach (xmlElem item in value)
+                    {
+                        item.Parent = this;
+                    }
                     pElements = value;
                     OnPropertyChanged("xmlElements");
                     OnPropertyChanged("Elements");
@@ -307,6 +330,10 @@ namespace ES_XML_Editor
 
         public ObservableCollection<xmlElem> childRearingElements
         {
+            set
+            {
+                OnPropertyChanged("childRearingElements");
+            }
             get
             {
                 ObservableCollection<xmlElem> returnable = new ObservableCollection<xmlElem>();
@@ -324,6 +351,10 @@ namespace ES_XML_Editor
 
         public ObservableCollection<xmlElem> dummyElements
         {
+            set
+            {
+                OnPropertyChanged("dummyElements");
+            }
             get
             {
                 ObservableCollection<xmlElem> returnable = new ObservableCollection<xmlElem>();
@@ -341,6 +372,10 @@ namespace ES_XML_Editor
 
         public ObservableCollection<xmlElem> lonelyElements
         {
+            set
+            {
+                OnPropertyChanged("lonelyElements");
+            }
             get
             {
                 ObservableCollection<xmlElem> returnable = new ObservableCollection<xmlElem>();
@@ -357,6 +392,10 @@ namespace ES_XML_Editor
 
         public ObservableCollection<xmlElem> AttributeElements
         {
+            set
+            {
+                OnPropertyChanged("AttributeElements");
+            }
             get
             {
                 ObservableCollection<xmlElem> returnable = new ObservableCollection<xmlElem>();
@@ -420,10 +459,12 @@ namespace ES_XML_Editor
             pElements = new List<xmlElem>();
             pAttributes = new List<xmlAttrib>();
 
-            foreach (xmlElem child in source.pElements)
-            {
-                this.pElements.Add(new xmlElem(child, this));
-            }
+            //foreach (xmlElem child in source.pElements)
+            //{
+            //    this.pElements.Add(new xmlElem(child));
+                
+            //}
+            this.AddElements(source.pElements);
 
             foreach (xmlAttrib item in source.pAttributes)
             {
@@ -518,10 +559,11 @@ namespace ES_XML_Editor
                 elementValue = "";
             }
 
-            foreach (XElement child in source.Elements())
-            {
-                this.pElements.Add(new xmlElem(child, this));
-            }
+            //foreach (XElement child in source.Elements())
+            //{
+            //    this.pElements.Add(new xmlElem(child, this));
+            //}
+            this.AddElements(source.Elements());
 
             foreach (XAttribute item in source.Attributes())
             {
@@ -559,6 +601,30 @@ namespace ES_XML_Editor
 
         #region functions
 
+        public void AddElements(IEnumerable<xmlElem> source)
+        {
+            List<xmlElem> temp = new List<xmlElem>(source);
+
+            for (int i = 0; i < temp.Count; i++)
+            {
+                temp[i].Parent= this;
+            }
+
+            this.pElements.AddRange(temp);
+        }
+
+        public void AddElements(IEnumerable<XElement> tempSource)
+        {
+            List<XElement> source = new List<XElement>(tempSource); 
+            List<xmlElem> destination = new List<xmlElem>(source.Count);
+            for (int i = 0; i < source.Count; i++)
+            {
+                destination.Add(new xmlElem(source[i]));
+                destination[i].Parent = this;
+            }
+            this.pElements.AddRange(destination);
+        }
+
         public xmlAttrib Attribute(String attrName)
         {
 
@@ -582,9 +648,10 @@ namespace ES_XML_Editor
             return childAttr;
         }
 
-        public void Add(xmlElem child)
+        public void AddElement(xmlElem child)
         {
-            pElements.Add(child);
+            child.Parent= this.Parent;
+            pElements.Add(new xmlElem(child));
         }
 
         public void Remove(xmlElem child)
@@ -691,6 +758,7 @@ namespace ES_XML_Editor
         #endregion
     }
 
+    #region obsolete
     public class xmlDoc
     {
         private XDeclaration xmlDeclaration;
@@ -1192,5 +1260,5 @@ namespace ES_XML_Editor
             }
         }//endfunction
     }
-
+    #endregion
 }

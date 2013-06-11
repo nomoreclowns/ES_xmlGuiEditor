@@ -224,17 +224,20 @@ namespace ES_XML_Editor
             String fileDirectory;
             String shortFileName;
 
-            openFileChooser(out shortFileName, out fileDirectory);
+            if (openFileChooser(out shortFileName, out fileDirectory) == true)
+            {
+                currentFile = new FileHandler(fileDirectory, shortFileName);
 
-            currentFile = new FileHandler(fileDirectory, shortFileName);
+                setOrGetSetting(EditorSettings.lastDirectoryOpened, ref fileDirectory, true);
 
-            setOrGetSetting(EditorSettings.lastDirectoryOpened, ref fileDirectory, true);
+                setOrGetSetting(EditorSettings.lastFileOpened, ref shortFileName, true);
 
-            setOrGetSetting(EditorSettings.lastFileOpened, ref shortFileName, true);
+                dataContainerSource = new xmlElem(currentFile.open());
 
-            dataContainerSource = new xmlElem(currentFile.open());
+                dataContainerView = (CollectionView)CollectionViewSource.GetDefaultView(dataContainer.xmlElements);
+            }
 
-            dataContainerView = (CollectionView)CollectionViewSource.GetDefaultView(dataContainer.xmlElements);
+            
         }
 
         /* ************************************************************************************************************************
@@ -277,7 +280,7 @@ namespace ES_XML_Editor
          *************************************************************************************************************************/
         protected void addData(xmlElem source)
         {
-            dataContainerSource.Add(source);
+            dataContainerSource.AddElement(source);
             OnPropertyChanged("dataContainer");
         }
 
@@ -332,8 +335,10 @@ namespace ES_XML_Editor
         protected void saveData()
         {
             //showErrorMessage(dataContainerSource.ToString());
+            currentFile.setFileContent(dataContainerSource);
             currentFile.save();
         }
+        
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
         protected void closeProgram()
@@ -349,6 +354,9 @@ namespace ES_XML_Editor
                 showErrorMessage("Invalid operation exception caught in function EditorController.closeProgram().");
             }
         }
+
+
+
 
         #endregion
 
@@ -397,7 +405,7 @@ namespace ES_XML_Editor
         
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        protected void openFileChooser(out String fileName, out String directory)
+        protected bool openFileChooser(out String fileName, out String directory)
         {
             OpenFileDialog fileChooser = new OpenFileDialog();
 
@@ -410,9 +418,10 @@ namespace ES_XML_Editor
                 String fullFileName = fileChooser.FileName;
                 fileName = fileChooser.SafeFileName;
                 directory = fileChooser.FileName.TrimEnd(fileName.ToCharArray());
-                return;
+                return true;
             }
             directory = fileName = null;
+            return false;
         }
 
         /* ************************************************************************************************************************
@@ -440,7 +449,7 @@ namespace ES_XML_Editor
             {
                 try
                 {
-                    temp.Add(recuresiveElementCloner(item));
+                    temp.AddElement(recuresiveElementCloner(item));
                 }
                 catch { }
             }
@@ -477,5 +486,82 @@ namespace ES_XML_Editor
         #endregion
 
     }//end of class
+
+
+
+    public class DirectoryHandler
+    {
+        private String pDirectoryPath;
+        private String[] pFileNameList;
+        private String[] pDirectoryList;
+        private DirectoryInfo parent;
+
+        public String workingDirectory
+        {
+            get
+            {
+                return pDirectoryPath;
+            }
+        }
+
+        public String[] Files
+        {
+            get
+            {
+                return pFileNameList;
+            }
+        }
+
+        public String[] SubDirectories
+        {
+            get
+            {
+                return pDirectoryList;
+            }
+        }
+
+        public DirectoryHandler(String dirPath)
+        {
+            if (Directory.Exists(dirPath) == true)
+            {
+                pDirectoryPath = dirPath;
+
+                try
+                {
+                    parent = Directory.GetParent(dirPath);
+                }
+                catch
+                {
+                    parent = null;
+                }
+                try
+                {
+                    pFileNameList = Directory.GetDirectories(dirPath, "", SearchOption.TopDirectoryOnly);
+
+                    for(int i=0; i<pDirectoryList.Length;i++)
+                    {
+                        pFileNameList[i]= pFileNameList[i].Substring(dirPath.Length+1, (pFileNameList[i].Length- dirPath.Length));;
+                    }
+                }
+                catch
+                {
+                    pFileNameList = null;
+                }
+                try
+                {
+                    pDirectoryList = Directory.GetFiles(dirPath, "", SearchOption.TopDirectoryOnly);
+
+                    foreach (String filePath in pFileNameList)
+                    {
+                    }
+                }
+                catch
+                {
+                    pDirectoryList = null;
+                }
+            }
+
+        }
+    }
 
 }
