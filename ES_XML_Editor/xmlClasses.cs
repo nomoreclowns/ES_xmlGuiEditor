@@ -82,11 +82,11 @@ namespace ES_XML_Editor
             attributeValue = source.Value;
         }
 
-        public xmlAttrib(xmlAttribute source)
-        {
-            attributeName = source.Name.ToString();
-            attributeValue = source.Value;
-        }
+        //public xmlAttrib(xmlAttribute source)
+        //{
+        //    attributeName = source.Name.ToString();
+        //    attributeValue = source.Value;
+        //}
 
         #endregion
 
@@ -251,7 +251,7 @@ namespace ES_XML_Editor
                 }
                 return null;
             }
-        } 
+        }
 
         public List<xmlElem> Elements
         {
@@ -286,7 +286,7 @@ namespace ES_XML_Editor
             {
                 if (value != null)
                 {
-                    pAttributes = new List<xmlAttrib>(value);
+                    convertCollection(value, ref pAttributes);
                     OnPropertyChanged("xmlAttributes");
                 }
             }
@@ -294,7 +294,8 @@ namespace ES_XML_Editor
             {
                 try
                 {
-                    ObservableCollection<xmlAttrib> returnable = new ObservableCollection<xmlAttrib>(pAttributes);
+                    ObservableCollection<xmlAttrib> returnable = new ObservableCollection<xmlAttrib>();
+                    convertList(pAttributes, ref returnable);
                     return returnable;
                 }
                 catch
@@ -310,7 +311,7 @@ namespace ES_XML_Editor
             {
                 if (value != null)
                 {
-                    pElements = new List<xmlElem>(value);
+                    convertCollection(value, ref pElements);
                     OnPropertyChanged("xmlElements");
                     OnPropertyChanged("Elements");
                     OnPropertyChanged("onlyChildAttributeElement");
@@ -324,6 +325,7 @@ namespace ES_XML_Editor
             get
             {
                 ObservableCollection<xmlElem> returnable = new ObservableCollection<xmlElem>(pElements);
+                convertList(pElements, ref returnable);
                 return returnable;
             }
         }
@@ -342,7 +344,7 @@ namespace ES_XML_Editor
                     //List<XElement> temp= new List<XElement>(Elements());
                     if (item.pElements.Count > 1 || (item.pElements.Count == 1 && item.pAttributes.Count > 0))
                     {
-                        returnable.Add(new xmlElem(item));
+                        returnable.Add(item);
                     }
                 }
                 return returnable;
@@ -363,7 +365,7 @@ namespace ES_XML_Editor
                     //List<XElement> temp= new List<XElement>(Elements());
                     if (item.pElements.Count == 1 && item.pAttributes.Count == 0)
                     {
-                        returnable.Add(new xmlElem(item));
+                        returnable.Add(item);
                     }
                 }
                 return returnable;
@@ -383,7 +385,7 @@ namespace ES_XML_Editor
                 {
                     if (item.HasElements == false && item.HasAttributes == false)
                     {
-                        returnable.Add(new xmlElem(item));
+                        returnable.Add(item);
                     }
                 }
                 return returnable;
@@ -403,7 +405,7 @@ namespace ES_XML_Editor
                 {
                     if (item.HasElements == false && item.HasAttributes == true)
                     {
-                        returnable.Add(new xmlElem(item));
+                        returnable.Add(item);
                     }
                 }
                 return returnable;
@@ -491,58 +493,58 @@ namespace ES_XML_Editor
             }
         }
 
-        public xmlElem(xmlElement source)
-        {
-            elementName = source.Name.ToString();
-            Parent = null;
-            pElements = new List<xmlElem>();
-            pAttributes = new List<xmlAttrib>();
-            if (source.HasElements == false)
-            {
-                elementValue = source.Value;
-            }
-            else
-            {
-                elementValue = "";
-            }
+        //public xmlElem(xmlElement source)
+        //{
+        //    elementName = source.Name.ToString();
+        //    Parent = null;
+        //    pElements = new List<xmlElem>();
+        //    pAttributes = new List<xmlAttrib>();
+        //    if (source.HasElements == false)
+        //    {
+        //        elementValue = source.Value;
+        //    }
+        //    else
+        //    {
+        //        elementValue = "";
+        //    }
 
-            foreach (XElement child in source.Elements())
-            {
-                this.pElements.Add(new xmlElem(child, this));
-            }
+        //    foreach (XElement child in source.Elements())
+        //    {
+        //        this.pElements.Add(new xmlElem(child, this));
+        //    }
 
-            foreach (XAttribute item in source.Attributes())
-            {
-                this.pAttributes.Add(new xmlAttrib(item));
-            }
-        }
+        //    foreach (XAttribute item in source.Attributes())
+        //    {
+        //        this.pAttributes.Add(new xmlAttrib(item));
+        //    }
+        //}
 
-        public xmlElem(xmlElement source, xmlElem parent)
-        {
-            elementName = source.Name.ToString();
-            Parent = parent;
-            pElements = new List<xmlElem>();
-            pAttributes = new List<xmlAttrib>();
+        //public xmlElem(xmlElement source, xmlElem parent)
+        //{
+        //    elementName = source.Name.ToString();
+        //    Parent = parent;
+        //    pElements = new List<xmlElem>();
+        //    pAttributes = new List<xmlAttrib>();
 
-            if (source.HasElements == false)
-            {
-                elementValue = source.Value;
-            }
-            else
-            {
-                elementValue = "";
-            }
+        //    if (source.HasElements == false)
+        //    {
+        //        elementValue = source.Value;
+        //    }
+        //    else
+        //    {
+        //        elementValue = "";
+        //    }
 
-            foreach (XElement child in source.Elements())
-            {
-                this.pElements.Add(new xmlElem(child, this));
-            }
+        //    foreach (XElement child in source.Elements())
+        //    {
+        //        this.pElements.Add(new xmlElem(child, this));
+        //    }
 
-            foreach (XAttribute item in source.Attributes())
-            {
-                this.pAttributes.Add(new xmlAttrib(item));
-            }
-        }
+        //    foreach (XAttribute item in source.Attributes())
+        //    {
+        //        this.pAttributes.Add(new xmlAttrib(item));
+        //    }
+        //}
 
         public xmlElem(XElement source)
         {
@@ -601,6 +603,47 @@ namespace ES_XML_Editor
 
         #region functions
 
+        // finish this as it might be solution
+        protected void convertList(List<xmlElem> source, ref ObservableCollection<xmlElem> destination)
+        {
+            foreach (xmlElem item in source)
+            {
+                item.Parent = this;
+                destination.Add(item);
+                //source.Remove(item);
+            }
+        }
+
+        protected void convertCollection(ObservableCollection<xmlElem> source, ref List<xmlElem> destination)
+        {
+            foreach (xmlElem item in source)
+            {
+                item.Parent = this;
+                destination.Add(item);
+                //source.Remove(item);
+            }
+        }
+
+        protected void convertList(List<xmlAttrib> source, ref ObservableCollection<xmlAttrib> destination)
+        {
+            foreach (xmlAttrib item in source)
+            {
+                //item.Parent = this;
+                destination.Add(item);
+                //source.Remove(item);
+            }
+        }
+
+        protected void convertCollection(ObservableCollection<xmlAttrib> source, ref List<xmlAttrib> destination)
+        {
+            foreach (xmlAttrib item in source)
+            {
+                //item.Parent = this;
+                destination.Add(item);
+                //source.Remove(item);
+            }
+        }
+
         public void AddElements(IEnumerable<xmlElem> source)
         {
             List<xmlElem> temp = new List<xmlElem>(source);
@@ -608,21 +651,35 @@ namespace ES_XML_Editor
             for (int i = 0; i < temp.Count; i++)
             {
                 temp[i].Parent= this;
+                this.pElements.Add(temp[i]);
             }
 
-            this.pElements.AddRange(temp);
+            //this.pElements.AddRange(temp);
         }
 
         public void AddElements(IEnumerable<XElement> tempSource)
         {
-            List<XElement> source = new List<XElement>(tempSource); 
+            List<XElement> source = new List<XElement>(tempSource);
             List<xmlElem> destination = new List<xmlElem>(source.Count);
-            for (int i = 0; i < source.Count; i++)
+            IEnumerator<XElement> iter = tempSource.GetEnumerator();
+
+            int i = 0;
+
+            foreach (XElement elem in tempSource)
             {
-                destination.Add(new xmlElem(source[i]));
-                destination[i].Parent = this;
+                pElements.Add(new xmlElem(elem));
+                pElements[pElements.Count - 1].Parent = this;
+                i++;
             }
-            this.pElements.AddRange(destination);
+
+
+            //for (int i = 0; i < source.Count; i++)
+            //{
+            //    iter.MoveNext();
+            //    destination.Add(new xmlElem(source[i]));
+            //    destination[i].Parent = this;
+            //}
+            //this.pElements.AddRange(destination);
         }
 
         public xmlAttrib Attribute(String attrName)
