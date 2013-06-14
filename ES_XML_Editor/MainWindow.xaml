@@ -239,13 +239,13 @@
                                 <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center"/>
                                 <TextBlock Text=":: " VerticalAlignment="Center"/>
                                 <StackPanel VerticalAlignment="Top" Orientation="Horizontal">
-                                    <TextBlock Text="{Binding Path=childDataElement.Name}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Path=onlyChildDataElement.Name}" VerticalAlignment="Center"/>
 
                                 </StackPanel>
                             </StackPanel>
                         </GroupBox.Header>
                         <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal">
-                            <TextBox Text="{Binding Path=childDataElement.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding Path=onlyChildDataElement.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
                             <Label Content="{Binding Path=AttributeElements, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ContentTemplate="{StaticResource childAttributeElement}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </GroupBox>
@@ -359,13 +359,17 @@
             <RowDefinition/>
             <RowDefinition x:Name="itemEditorArea"/>
         </Grid.RowDefinitions>
-        <ListBox ItemTemplate="{StaticResource xmlListItemTemplate}" x:Name="windowListbox" Grid.Row="1" Background="#FFF1F1F1" SelectionChanged="windowListBoxSelectionChanged" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Auto" Padding="5,0,10,0" ScrollViewer.CanContentScroll="False" Grid.Column="1" IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding dataView, ElementName=PrimaryWindow, Mode=OneWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}">
-            <ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel IsItemsHost="True"/>
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-        </ListBox>
+        <TabControl Grid.Column="1" Grid.Row="1">
+            <TabItem Header="test">
+                <ListBox VirtualizingStackPanel.VirtualizationMode="Recycling" ItemTemplate="{StaticResource xmlListItemTemplate}" x:Name="windowListbox" Background="#FFF1F1F1" SelectionChanged="windowListBoxSelectionChanged" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Auto" Padding="5,0,10,0" ScrollViewer.CanContentScroll="False" IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding dataView, ElementName=PrimaryWindow, Mode=OneWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel IsItemsHost="True"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
+            </TabItem>
+        </TabControl>
         <DockPanel Background="#FFD1D1D1" Grid.ColumnSpan="2" LastChildFill="False" ScrollViewer.VerticalScrollBarVisibility="Disabled">
             <Button Content="Open File" HorizontalAlignment="Left" Click="openFileButtonClick"/>
             <StackPanel Orientation="Horizontal" Visibility="Collapsed">
@@ -390,7 +394,7 @@
             <ScrollViewer VerticalScrollBarVisibility="Auto" x:Name="listBoxItemViewer"  ContentTemplate="{StaticResource viewerTemplate}" Grid.Row="1" />
             <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right">
                 <Button Content="Save Edits" Click="saveItem"/>
-                <Button Content="Save as New Item" Click="saveNewItemClick"/>
+                <Button Content="Duplicate Item" Click="duplicateItemClick"/>
             </StackPanel>
         </Grid>
         <GridSplitter Background="#FFD1D1D1" Width="5" ResizeDirection="Columns" DragCompleted="sidePanelResizedHandler" Grid.Row="1"/>

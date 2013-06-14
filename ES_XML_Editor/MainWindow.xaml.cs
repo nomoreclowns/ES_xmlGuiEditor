@@ -36,6 +36,9 @@ namespace ES_XML_Editor
 
         #endregion
 
+
+
+
         #region enumSettingInstaces
 
         private const EditorController.EditorSettings heightSettingEnum = EditorController.EditorSettings.editingWindowHeight;
@@ -368,14 +371,14 @@ namespace ES_XML_Editor
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        private void saveNewItemClick(object sender, RoutedEventArgs e)
+        private void duplicateItemClick(object sender, RoutedEventArgs e)
         {
             int listIndex= windowListbox.Items.Count;
             try
             {
-                contItemAdder(itemEditorData);
-                contBinder(ref dataViewSource);
-                dataView = dataViewSource;
+                contItemAdder(new xmlElem(itemEditorData));
+                //contBinder(ref dataViewSource);
+                //dataView = dataViewSource;
 
                 windowListbox.SelectedItem = windowListbox.Items[listIndex];
             }

@@ -324,7 +324,7 @@ namespace ES_XML_Editor
             }
             get
             {
-                ObservableCollection<xmlElem> returnable = new ObservableCollection<xmlElem>(pElements);
+                ObservableCollection<xmlElem> returnable = new ObservableCollection<xmlElem>();
                 convertList(pElements, ref returnable);
                 return returnable;
             }
@@ -648,20 +648,29 @@ namespace ES_XML_Editor
         {
             List<xmlElem> temp = new List<xmlElem>(source);
 
-            for (int i = 0; i < temp.Count; i++)
+            //int i = 0;
+
+            foreach(xmlElem elem in temp)
             {
-                temp[i].Parent= this;
-                this.pElements.Add(temp[i]);
+                elem.Parent = this;
+                pElements.Add(elem);
+                //pElements[pElements.Count - 1].Parent = this;
+                //i++;
             }
+            //for (int i = 0; i < temp.Count; i++)
+            //{
+            //    temp[i].Parent= this;
+            //    this.pElements.Add(temp[i]);
+            //}
 
             //this.pElements.AddRange(temp);
         }
 
         public void AddElements(IEnumerable<XElement> tempSource)
         {
-            List<XElement> source = new List<XElement>(tempSource);
-            List<xmlElem> destination = new List<xmlElem>(source.Count);
-            IEnumerator<XElement> iter = tempSource.GetEnumerator();
+            //List<XElement> source = new List<XElement>(tempSource);
+            //List<xmlElem> destination = new List<xmlElem>(source.Count);
+            //IEnumerator<XElement> iter = tempSource.GetEnumerator();
 
             int i = 0;
 

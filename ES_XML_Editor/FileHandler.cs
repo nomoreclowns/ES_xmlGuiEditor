@@ -18,12 +18,7 @@ namespace ES_XML_Editor
 
         private String handledFileName;
 
-        public FileHandler(String tempFileDirectory, String tempFileName)
-        {
-            handledDirectory = tempFileDirectory;
-            handledFileName = tempFileName;
-
-        }
+        private String pFilePath;
 
         public String fileDirectory
         {
@@ -43,25 +38,31 @@ namespace ES_XML_Editor
 
         private xmlDoc xmlFile;
 
+
+
+        public FileHandler(String tempFileDirectory, String tempFileName)
+        {
+            pFilePath = tempFileDirectory + tempFileName;
+            handledFileName = tempFileName;
+
+        }
+
+        public FileHandler(String tempFullFilePath)
+        {
+            pFilePath = tempFullFilePath;
+
+        }
+
         public xmlElem open()
         {
             try
             {
                 //load xml file as a single element representing the root node
-                //XElement xmlRootNode = XDocument.Load(handledDirectory+handledFileName).Element(settings.xmlRootElementName);
+                XDocument temp = new XDocument(XDocument.Load(pFilePath));
 
-                XDocument temp= new XDocument(XDocument.Load(handledDirectory + handledFileName));
-
-                //MessageBox.Show(temp.ToString(), "Error!", MessageBoxButton.OK);
-                
                 xmlFile = new xmlDoc(temp);
 
-
-                // An object to enumerate over the XML nodes
-                //IEnumerable<XElement> xmlElements = (from c in xmlFile.root.Elements() select c);
-
                 return new xmlElem(xmlFile.root);
-
             }
             catch
             {
@@ -74,35 +75,35 @@ namespace ES_XML_Editor
             xmlFile.root = content;
         }
 
-        public void save(XElement data)
-        {
-            String temp = handledDirectory + handledFileName;
-
-            if (File.Exists(temp))
-            {
-                data.Save(temp);
-            }
-        }
-
-        public void save(xmlDoc data)
-        {
-            File.WriteAllText((handledDirectory + handledFileName), data.ToString(), System.Text.Encoding.UTF8);
-        }
-
         public void save()
         {
-            File.WriteAllText((handledDirectory + handledFileName), xmlFile.ToString(), System.Text.Encoding.UTF8);
+            File.WriteAllText((pFilePath), xmlFile.ToString(), System.Text.Encoding.UTF8);
         }
 
-        public void save(xmlElement data)
-        {
-            String temp = handledDirectory + handledFileName;
+        //public void save(XElement data)
+        //{
+        //    String temp = handledDirectory + handledFileName;
 
-            if (File.Exists(temp))
-            {
-                data.Save(temp);
-            }
-        }
+        //    if (File.Exists(pFilePath))
+        //    {
+        //        data.Save(pFilePath);
+        //    }
+        //}
+
+        //public void save(xmlDoc data)
+        //{
+        //    File.WriteAllText((handledDirectory + handledFileName), data.ToString(), System.Text.Encoding.UTF8);
+        //}
+
+        //public void save(xmlElement data)
+        //{
+        //    String temp = handledDirectory + handledFileName;
+
+        //    if (File.Exists(pFilePath))
+        //    {
+        //        data.Save(pFilePath);
+        //    }
+        //}
 
     }
 }

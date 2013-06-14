@@ -17,12 +17,12 @@ using System.Windows.Controls;
 
 namespace ES_XML_Editor
 {
-
+    /*
     #region delegatesAndContainerClasses
 
     public delegate void controllerManipulateSetting(EditorController.EditorSettings delSettingKey, ref String delSettingValue, bool delSaveSetting = false);
 
-    public delegate void controllerOpenFile();
+    public delegate void controllerOpenFile(bool delBool = false);
 
     public delegate void controllerBind(ref CollectionView delcollectionView);
 
@@ -111,6 +111,8 @@ namespace ES_XML_Editor
     }
 
     #endregion
+    */
+
 
     /// <summary>
     /// Interaction logic for EditorController.xaml
@@ -146,37 +148,41 @@ namespace ES_XML_Editor
         private static ProgramSettings embeddedSettings = ProgramSettings.Default;
 
         // list that stores the contents of a file
-        private xmlElem dataContainerSource;
+        private List<xmlElem> dataContainerList;
+        private xmlElem oldDataSource;
 
         // folder where program places important files (like user settings file)
         private String ProgramStoringFolder;
-
-        private String userSettingsFilePath;
 
         // Manager for the users' settings file
         private KeyValuePairDataBase userSettings;
 
         //instance of the base window
-        private MainWindow baseWindowObject;
+        //private MainWindow baseWindowObject;
 
         // the current "view" of the list
-        private CollectionView dataContainerView;
+        private CollectionView oldDataView;
 
+
+
+        private List<FileHandler> filesOpen;
         private FileHandler currentFile;
+
+        private DirectoryHandler workingDirectory;
         
-        public xmlElem dataContainer
+        public xmlElem oldDataContainer
         {
             set
             {
                 if (value != null)
                 {
-                    dataContainerSource = value;
+                    oldDataSource = value;
                     OnPropertyChanged("dataContainer");
                 }
             }
             get
             {
-                return dataContainerSource;
+                return oldDataSource;
             }
         }
 
@@ -187,57 +193,101 @@ namespace ES_XML_Editor
         {
             InitializeComponent();
 
-
             retrieveSettingsFile();
 
-            String workingDirectory = userSettings.getValue(EditorSettings.lastDirectoryOpened.ToString());
-            
-            String tempFileName = userSettings.getValue(EditorSettings.lastFileOpened.ToString());
-            try
-            {
-                currentFile = new FileHandler(workingDirectory, tempFileName);
+            String tempWorkingDirectory = userSettings.getValue(EditorSettings.lastDirectoryOpened.ToString());
 
-                dataContainerSource = new xmlElem(currentFile.open());
-                dataContainerView = (CollectionView)CollectionViewSource.GetDefaultView(dataContainerSource.xmlElements);
-            }
-            catch
+            if (Directory.Exists(tempWorkingDirectory) == true)
             {
-                if (Directory.Exists(workingDirectory) == false)
+                workingDirectory = new DirectoryHandler(tempWorkingDirectory, new controllerShowError(showErrorMessage));
+
+                String tempFileName = userSettings.getValue(EditorSettings.lastFileOpened.ToString());
+
+                testListView.ItemsSource = workingDirectory.contents;
+
+                try
                 {
-                    currentFile = new FileHandler(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "");
+                    currentFile = new FileHandler(workingDirectory.path + tempFileName);
+
+                    oldDataSource = new xmlElem(currentFile.open());
+                    oldDataView = (CollectionView)CollectionViewSource.GetDefaultView(oldDataSource.xmlElements);
                 }
-                else
+                catch
                 {
-                    currentFile = new FileHandler(workingDirectory, "");
+                    currentFile = new FileHandler(tempWorkingDirectory, "");
                 }
+            }
+            else
+            {
+                workingDirectory = new DirectoryHandler(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), new controllerShowError(showErrorMessage));
+                currentFile = new FileHandler(workingDirectory.path, "");
             }
 
-            showPrimaryWindow();
+
+            //showPrimaryWindow();
         }
 
         #region delegateFunctions
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        protected void openFile()
+        protected void openFile(bool useNewVersion = false)
         {
             String fileDirectory;
             String shortFileName;
 
+            if (useNewVersion == false)
+            {
+                if (openFileChooser(out shortFileName, out fileDirectory) == true)
+                {
+                    currentFile = new FileHandler(fileDirectory, shortFileName);
+
+                    setOrGetSetting(EditorSettings.lastDirectoryOpened, ref fileDirectory, true);
+
+                    setOrGetSetting(EditorSettings.lastFileOpened, ref shortFileName, true);
+
+                    oldDataSource = new xmlElem(currentFile.open());
+
+                    oldDataView = (CollectionView)CollectionViewSource.GetDefaultView(oldDataContainer.xmlElements);
+                }
+                return;
+            }
+
             if (openFileChooser(out shortFileName, out fileDirectory) == true)
             {
-                currentFile = new FileHandler(fileDirectory, shortFileName);
+                FileHandler tempFileHandler = new FileHandler(fileDirectory, shortFileName);
 
                 setOrGetSetting(EditorSettings.lastDirectoryOpened, ref fileDirectory, true);
 
                 setOrGetSetting(EditorSettings.lastFileOpened, ref shortFileName, true);
 
-                dataContainerSource = new xmlElem(currentFile.open());
+                xmlElem tempDataElement = new xmlElem(currentFile.open());
 
-                dataContainerView = (CollectionView)CollectionViewSource.GetDefaultView(dataContainer.xmlElements);
+                //dataContainerView = (CollectionView)CollectionViewSource.GetDefaultView(dataContainer.xmlElements);
+                filesOpen.Clear();
+                filesOpen.Add(tempFileHandler);
+                dataContainerList.Clear();
+                dataContainerList.Add(tempDataElement);
             }
 
-            
+        }
+
+        protected void openAnotherFile(String fileName, ref CollectionView guiCollectionView)
+        {
+            FileHandler tempFileHandler = new FileHandler(workingDirectory.path, fileName);
+            xmlElem tempDataElement = new xmlElem(tempFileHandler.open());
+
+            try
+            {
+                guiCollectionView = (CollectionView)CollectionViewSource.GetDefaultView(tempDataElement.xmlElements);
+            }
+            catch
+            {
+                showErrorMessage("Could not bind to xml");
+            }
+
+            filesOpen.Add(tempFileHandler);
+            dataContainerList.Add(tempDataElement);
         }
 
         /* ************************************************************************************************************************
@@ -249,7 +299,22 @@ namespace ES_XML_Editor
             {
                 //guiCollectionView = dataContainerView;
 
-                guiCollectionView = (CollectionView)CollectionViewSource.GetDefaultView(dataContainer.xmlElements);
+                guiCollectionView = (CollectionView)CollectionViewSource.GetDefaultView(oldDataContainer.xmlElements);
+
+            }
+            catch
+            {
+                //temporary error message
+                showErrorMessage("Could not bind to xml");
+            }
+        }
+
+        protected void bindFunction(ref CollectionView guiCollectionView, int fileDataSelector)
+        {
+            try
+            {
+
+                guiCollectionView = (CollectionView)CollectionViewSource.GetDefaultView(dataContainerList[fileDataSelector].xmlElements);
 
             }
             catch
@@ -265,13 +330,17 @@ namespace ES_XML_Editor
          *************************************************************************************************************************/
         protected void selectData(int[] indices, ref xmlElem itemContainer)
         {
-            if (indices.Length == 1)
+            if (indices.Length == 0)
             {
-                itemContainer = new xmlElem(dataContainerSource.xmlElements[indices[0]]);
+                return;
+            }
+            else if (indices.Length == 1)
+            {
+                itemContainer = oldDataSource.xmlElements[indices[0]];
             }
             else
             {
-                itemContainer = createItem(dataContainerSource.xmlElements[0]);
+                itemContainer = createItem(oldDataSource.xmlElements[indices[0]]);
             }
         }
         
@@ -280,8 +349,13 @@ namespace ES_XML_Editor
          *************************************************************************************************************************/
         protected void addData(xmlElem source)
         {
-            dataContainerSource.AddElement(source);
-            OnPropertyChanged("dataContainer");
+            oldDataSource.AddElement(source);
+            //OnPropertyChanged("dataContainer");
+        }
+
+        protected void addData(xmlElem source, int fileDataSelector)
+        {
+            dataContainerList[fileDataSelector].AddElement(source);
         }
 
         /* ************************************************************************************************************************
@@ -295,13 +369,29 @@ namespace ES_XML_Editor
                 foreach (int index in selectedIndeces)
                 {
                     //XAttribute childAttribute = temp[index].Attribute("Name");
-                    dataContainerSource.replaceChildByAttrValue("Name", dataContainerSource.xmlElements[index].Attribute("Name").Value, data);
+                    oldDataSource.replaceChildByAttrValue("Name", oldDataSource.xmlElements[index].Attribute("Name").Value, data);
                     
                     
                 }
             }
             OnPropertyChanged("dataContainer");
+        }
 
+        protected void editData(xmlElem data, int[] selectedIndeces, int fileDataSelector)
+        {
+            //List<xmlElem> temp= new List<xmlElem>(dataContainer.xmlElements);
+
+            if (selectedIndeces.Length == 1)
+            {
+                foreach (int index in selectedIndeces)
+                {
+                    //XAttribute childAttribute = temp[index].Attribute("Name");
+                    dataContainerList[fileDataSelector].replaceChildByAttrValue("Name", oldDataSource.xmlElements[index].Attribute("Name").Value, data);
+
+
+                }
+            }
+            //OnPropertyChanged("dataContainer");
         }
 
         /* ************************************************************************************************************************
@@ -335,10 +425,19 @@ namespace ES_XML_Editor
         protected void saveData()
         {
             //showErrorMessage(dataContainerSource.ToString());
-            currentFile.setFileContent(dataContainerSource);
+            currentFile.setFileContent(oldDataSource);
             currentFile.save();
         }
-        
+
+        protected void saveData(int fileDataSelector)
+        {
+            //showErrorMessage(dataContainerSource.ToString());
+            filesOpen[fileDataSelector].setFileContent(oldDataSource);
+            filesOpen[fileDataSelector].save();
+            //currentFile.setFileContent(oldDataSource);
+            //currentFile.save();
+        }
+
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
         protected void closeProgram()
@@ -369,10 +468,9 @@ namespace ES_XML_Editor
         {
             ProgramStoringFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), embeddedSettings.progName);
 
-            userSettingsFilePath = System.IO.Path.Combine(ProgramStoringFolder, embeddedSettings.settingsFileName);
             try
             {
-                userSettings = new KeyValuePairDataBase(userSettingsFilePath);
+                userSettings = new KeyValuePairDataBase(System.IO.Path.Combine(ProgramStoringFolder, embeddedSettings.settingsFileName));
             }
             catch
             {
@@ -391,16 +489,16 @@ namespace ES_XML_Editor
             Double height = Convert.ToDouble(userSettings.getValue(EditorSettings.editingWindowHeight.ToString()));
             Double width = Convert.ToDouble(userSettings.getValue(EditorSettings.editingWindowWidth.ToString()));
 
-            baseWindowObject = new MainWindow(tempItem1, tempItem2, tempItem3);
+            //baseWindowObject = new MainWindow(tempItem1, tempItem2, tempItem3);
             try
             {
-                baseWindowObject.Height = height;
-                baseWindowObject.Width = width;
+                //baseWindowObject.Height = height;
+                //baseWindowObject.Width = width;
             }
             catch { }
 
-            baseWindowObject.optionalInitialSetup();
-            baseWindowObject.Show();
+            //baseWindowObject.optionalInitialSetup();
+            //baseWindowObject.Show();
         }
         
         /* ************************************************************************************************************************
@@ -460,7 +558,7 @@ namespace ES_XML_Editor
          *************************************************************************************************************************/
         protected void saveSettings()
         {
-            String settingsPath = System.IO.Path.Combine(ProgramStoringFolder, "settings.xml");
+            String settingsPath = System.IO.Path.Combine(ProgramStoringFolder, embeddedSettings.settingsFileName);
             try
             {
                 userSettings.saveToFile(settingsPath);
@@ -480,23 +578,86 @@ namespace ES_XML_Editor
         protected void programActivated(object sender, EventArgs e)
         {
             //redirect focus to primary window for now
-            baseWindowObject.Activate();
+            //baseWindowObject.Activate();
         }
 
         #endregion
 
+        private void listViewItemDoubleCLick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+
+        }
+
+        protected void listViewItemActivation()
+        {
+            ioObject temp = testListView.SelectedItem as ioObject;
+
+            if (temp.fileKind == ioObject.Filetype.File)
+            {
+                ;
+            }
+            else
+            {
+
+            }
+
+        }
+
     }//end of class
 
+    public class ioObject
+    {
+        public enum Filetype
+        {
+            File,
+            Folder
+        }
 
+        protected String pName = "";
+
+        protected Filetype pKind;
+
+        public String name
+        {
+            get
+            {
+                return pName;
+            }
+        }
+
+        public String kind
+        {
+            get
+            {
+                return pKind.ToString();
+            }
+        }
+
+        public ioObject.Filetype fileKind
+        {
+            get
+            {
+                return pKind;
+            }
+        }
+
+        public ioObject(String iName, ioObject.Filetype iKind)
+        {
+            pName = iName;
+
+            pKind = iKind;
+        }
+    }
 
     public class DirectoryHandler
     {
+        private controllerShowError contDisplayError;
         private String pDirectoryPath;
-        private String[] pFileNameList;
-        private String[] pDirectoryList;
         private DirectoryInfo parent;
 
-        public String workingDirectory
+        private List<ioObject> pContents;
+
+        public String path
         {
             get
             {
@@ -504,63 +665,79 @@ namespace ES_XML_Editor
             }
         }
 
-        public String[] Files
+        public List<ioObject> contents
         {
             get
             {
-                return pFileNameList;
+                return pContents;
             }
         }
 
-        public String[] SubDirectories
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        public DirectoryHandler(String dirPath, controllerShowError DisplayError)
         {
-            get
+            contDisplayError = DisplayError;
+
+            pContents= new List<ioObject>();
+
+            pDirectoryPath = dirPath;
+
+            retrieveContents();
+
+            try
             {
-                return pDirectoryList;
+                parent = Directory.GetParent(pDirectoryPath);
             }
+            catch
+            {
+                contDisplayError("unable to retrieve parent of folder "+dirPath);
+            }
+
+
         }
 
-        public DirectoryHandler(String dirPath)
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        protected void retrieveContents()
         {
-            if (Directory.Exists(dirPath) == true)
+            if (Directory.Exists(pDirectoryPath) == true)
             {
-                pDirectoryPath = dirPath;
+
+                int pathLength = pDirectoryPath.Length;
 
                 try
                 {
-                    parent = Directory.GetParent(dirPath);
-                }
-                catch
-                {
-                    parent = null;
-                }
-                try
-                {
-                    pFileNameList = Directory.GetDirectories(dirPath, "", SearchOption.TopDirectoryOnly);
+                    String[] directoryArray = Directory.GetDirectories(pDirectoryPath, "*", SearchOption.TopDirectoryOnly);
 
-                    for(int i=0; i<pDirectoryList.Length;i++)
+                    for (int i = 0; i < directoryArray.Length; i++)
                     {
-                        pFileNameList[i]= pFileNameList[i].Substring(dirPath.Length+1, (pFileNameList[i].Length- dirPath.Length));;
+                        pContents.Add(new ioObject(directoryArray[i].Substring(pathLength), ioObject.Filetype.Folder));
                     }
                 }
                 catch
                 {
-                    pFileNameList = null;
+                    contDisplayError("Could not retrieve directories.");
                 }
                 try
                 {
-                    pDirectoryList = Directory.GetFiles(dirPath, "", SearchOption.TopDirectoryOnly);
+                    String[] fileArray = Directory.GetFiles(pDirectoryPath, "*", SearchOption.TopDirectoryOnly);
 
-                    foreach (String filePath in pFileNameList)
+                    for (int i = 0; i < fileArray.Length; i++)
                     {
+                        pContents.Add(new ioObject(fileArray[i].Substring(pathLength), ioObject.Filetype.File));
                     }
                 }
-                catch
+                catch (Exception e)
                 {
-                    pDirectoryList = null;
+                    throw e;
                 }
+                return;
             }
-
+            else
+            {
+                contDisplayError("Cannot show a directory that does not exist");
+            }
         }
     }
 
