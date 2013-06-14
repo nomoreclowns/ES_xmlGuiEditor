@@ -158,7 +158,7 @@ namespace ES_XML_Editor
         private KeyValuePairDataBase userSettings;
 
         //instance of the base window
-        //private MainWindow baseWindowObject;
+        private MainWindow baseWindowObject;
 
         // the current "view" of the list
         private CollectionView oldDataView;
@@ -195,6 +195,10 @@ namespace ES_XML_Editor
 
             retrieveSettingsFile();
 
+            filesOpen= new List<FileHandler>();
+
+            dataContainerList = new List<xmlElem>();
+
             String tempWorkingDirectory = userSettings.getValue(EditorSettings.lastDirectoryOpened.ToString());
 
             if (Directory.Exists(tempWorkingDirectory) == true)
@@ -203,7 +207,7 @@ namespace ES_XML_Editor
 
                 String tempFileName = userSettings.getValue(EditorSettings.lastFileOpened.ToString());
 
-                testListView.ItemsSource = workingDirectory.contents;
+                //testListView.ItemsSource = workingDirectory.contents;
 
                 try
                 {
@@ -224,17 +228,16 @@ namespace ES_XML_Editor
             }
 
 
-            //showPrimaryWindow();
+            showPrimaryWindow();
         }
 
         #region delegateFunctions
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        protected void openFile(bool useNewVersion = false)
+        protected void openFile(out String shortFileName, bool useNewVersion = true)
         {
             String fileDirectory;
-            String shortFileName;
 
             if (useNewVersion == false)
             {
@@ -259,7 +262,7 @@ namespace ES_XML_Editor
 
                 setOrGetSetting(EditorSettings.lastDirectoryOpened, ref fileDirectory, true);
 
-                setOrGetSetting(EditorSettings.lastFileOpened, ref shortFileName, true);
+                //setOrGetSetting(EditorSettings.lastFileOpened, ref shortFileName, true);
 
                 xmlElem tempDataElement = new xmlElem(currentFile.open());
 
@@ -272,7 +275,7 @@ namespace ES_XML_Editor
 
         }
 
-        protected void openAnotherFile(String fileName, ref CollectionView guiCollectionView)
+        protected void openAnotherFile(out CollectionView guiCollectionView, String fileName)
         {
             FileHandler tempFileHandler = new FileHandler(workingDirectory.path, fileName);
             xmlElem tempDataElement = new xmlElem(tempFileHandler.open());
@@ -284,6 +287,26 @@ namespace ES_XML_Editor
             catch
             {
                 showErrorMessage("Could not bind to xml");
+                guiCollectionView = null;
+            }
+
+            filesOpen.Add(tempFileHandler);
+            dataContainerList.Add(tempDataElement);
+        }
+
+        protected void openAnotherFile(out CollectionView guiCollectionView, int fileNameIndex)
+        {
+            FileHandler tempFileHandler = new FileHandler(workingDirectory.path, filesOpen[fileNameIndex].fileName);
+            xmlElem tempDataElement = new xmlElem(tempFileHandler.open());
+
+            try
+            {
+                guiCollectionView = (CollectionView)CollectionViewSource.GetDefaultView(tempDataElement.xmlElements);
+            }
+            catch
+            {
+                showErrorMessage("Could not bind to xml");
+                guiCollectionView = null;
             }
 
             filesOpen.Add(tempFileHandler);
@@ -292,7 +315,14 @@ namespace ES_XML_Editor
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        protected void bindFunction(ref CollectionView guiCollectionView)
+        protected void passFolderContents(out CollectionView guiContentsCollectionView)
+        {
+            guiContentsCollectionView = (CollectionView)CollectionViewSource.GetDefaultView(workingDirectory.contents);
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        protected void bindFunction(out CollectionView guiCollectionView)
         {
             //guiListBox.ItemsSource = dataContainerView;
             try
@@ -300,20 +330,19 @@ namespace ES_XML_Editor
                 //guiCollectionView = dataContainerView;
 
                 guiCollectionView = (CollectionView)CollectionViewSource.GetDefaultView(oldDataContainer.xmlElements);
-
             }
             catch
             {
                 //temporary error message
                 showErrorMessage("Could not bind to xml");
+                guiCollectionView = null;
             }
         }
 
-        protected void bindFunction(ref CollectionView guiCollectionView, int fileDataSelector)
+        protected void bindFunction(out CollectionView guiCollectionView, int fileDataSelector)
         {
             try
             {
-
                 guiCollectionView = (CollectionView)CollectionViewSource.GetDefaultView(dataContainerList[fileDataSelector].xmlElements);
 
             }
@@ -321,6 +350,7 @@ namespace ES_XML_Editor
             {
                 //temporary error message
                 showErrorMessage("Could not bind to xml");
+                guiCollectionView = null;
             }
         }
 
@@ -343,7 +373,25 @@ namespace ES_XML_Editor
                 itemContainer = createItem(oldDataSource.xmlElements[indices[0]]);
             }
         }
-        
+
+        protected void selectData(int[] indices, ref xmlElem itemContainer, int fileDataSelector)
+        {
+            if (indices.Length == 0)
+            {
+                return;
+            }
+            else if (indices.Length == 1)
+            {
+                itemContainer = dataContainerList[fileDataSelector].xmlElements[indices[0]];
+                //itemContainer = oldDataSource.xmlElements[indices[0]];
+            }
+            else
+            {
+                itemContainer = createItem(dataContainerList[fileDataSelector].xmlElements[indices[0]]);
+                //itemContainer = createItem(oldDataSource.xmlElements[indices[0]]);
+            }
+        }
+
         /* ************************************************************************************************************************
          * a wrapper function for the Xcontainer Add() method that gets passed to other classes through a delegate
          *************************************************************************************************************************/
@@ -484,21 +532,21 @@ namespace ES_XML_Editor
         {
             controllerDelegateContainer tempItem1 = new controllerDelegateContainer(showErrorMessage, closeProgram);
             controllerDataDelegateContainer tempItem2 = new controllerDataDelegateContainer(bindFunction, selectData, addData, editData);
-            controllerMiscDelegateContainer tempItem3 = new controllerMiscDelegateContainer(openFile, setOrGetSetting, saveData);
+            controllerMiscDelegateContainer tempItem3 = new controllerMiscDelegateContainer(openFile, setOrGetSetting, saveData, passFolderContents);
 
             Double height = Convert.ToDouble(userSettings.getValue(EditorSettings.editingWindowHeight.ToString()));
             Double width = Convert.ToDouble(userSettings.getValue(EditorSettings.editingWindowWidth.ToString()));
 
-            //baseWindowObject = new MainWindow(tempItem1, tempItem2, tempItem3);
+            baseWindowObject = new MainWindow(tempItem1, tempItem2, tempItem3);
             try
             {
-                //baseWindowObject.Height = height;
-                //baseWindowObject.Width = width;
+                baseWindowObject.Height = height;
+                baseWindowObject.Width = width;
             }
             catch { }
 
-            //baseWindowObject.optionalInitialSetup();
-            //baseWindowObject.Show();
+            baseWindowObject.optionalInitialSetup();
+            baseWindowObject.Show();
         }
         
         /* ************************************************************************************************************************
@@ -509,7 +557,7 @@ namespace ES_XML_Editor
 
             fileChooser.Multiselect = false;
             fileChooser.Filter = "XML|*.xml;";
-            fileChooser.InitialDirectory = currentFile.fileDirectory;
+            fileChooser.InitialDirectory = workingDirectory.path;
 
             if (fileChooser.ShowDialog(this) == true)
             {
@@ -578,30 +626,30 @@ namespace ES_XML_Editor
         protected void programActivated(object sender, EventArgs e)
         {
             //redirect focus to primary window for now
-            //baseWindowObject.Activate();
+            baseWindowObject.Activate();
         }
 
         #endregion
 
-        private void listViewItemDoubleCLick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
+        //private void listViewItemDoubleCLick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        //{
 
-        }
+        //}
 
-        protected void listViewItemActivation()
-        {
-            ioObject temp = testListView.SelectedItem as ioObject;
+        //protected void listViewItemActivation()
+        //{
+        //    ioObject temp = testListView.SelectedItem as ioObject;
 
-            if (temp.fileKind == ioObject.Filetype.File)
-            {
-                ;
-            }
-            else
-            {
+        //    if (temp.fileKind == ioObject.Filetype.File)
+        //    {
+        //        ;
+        //    }
+        //    else
+        //    {
 
-            }
+        //    }
 
-        }
+        //}
 
     }//end of class
 

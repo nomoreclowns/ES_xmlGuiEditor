@@ -20,13 +20,13 @@ namespace ES_XML_Editor
 
         private String pFilePath;
 
-        public String fileDirectory
-        {
-            get
-            {
-                return handledDirectory;
-            }
-        }
+        //public String fileDirectory
+        //{
+        //    get
+        //    {
+        //        return handledDirectory;
+        //    }
+        //}
 
         public String fileName
         {

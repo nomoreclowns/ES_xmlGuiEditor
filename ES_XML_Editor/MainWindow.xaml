@@ -189,7 +189,7 @@
                     <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal">
                         <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center" Margin="2,2,0,2"/>
                         <TextBlock Text="= " VerticalAlignment="Center" Margin="0,2"/>
-                        <TextBox HorizontalAlignment="Left" Text="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Margin="0,0,0,1" MaxLines="1" UndoLimit="5" Padding="0,-1" MinHeight="0" VerticalContentAlignment="Bottom" TextChanged="viewerItemTextChanged"/>
+                        <TextBox HorizontalAlignment="Left" Text="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Margin="0,0,0,1" MaxLines="1" UndoLimit="5" Padding="0,-1" MinHeight="0" VerticalContentAlignment="Bottom"/>
                     </StackPanel>
                 </DataTemplate>
 
@@ -359,7 +359,8 @@
             <RowDefinition/>
             <RowDefinition x:Name="itemEditorArea"/>
         </Grid.RowDefinitions>
-        <TabControl Grid.Column="1" Grid.Row="1">
+        <TabControl x:Name="xmlTabControl" Grid.Column="1" Grid.Row="1">
+            <!--
             <TabItem Header="test">
                 <ListBox VirtualizingStackPanel.VirtualizationMode="Recycling" ItemTemplate="{StaticResource xmlListItemTemplate}" x:Name="windowListbox" Background="#FFF1F1F1" SelectionChanged="windowListBoxSelectionChanged" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Auto" Padding="5,0,10,0" ScrollViewer.CanContentScroll="False" IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding dataView, ElementName=PrimaryWindow, Mode=OneWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}">
                     <ListBox.ItemsPanel>
@@ -369,6 +370,7 @@
                     </ListBox.ItemsPanel>
                 </ListBox>
             </TabItem>
+            -->
         </TabControl>
         <DockPanel Background="#FFD1D1D1" Grid.ColumnSpan="2" LastChildFill="False" ScrollViewer.VerticalScrollBarVisibility="Disabled">
             <Button Content="Open File" HorizontalAlignment="Left" Click="openFileButtonClick"/>
@@ -399,39 +401,44 @@
         </Grid>
         <GridSplitter Background="#FFD1D1D1" Width="5" ResizeDirection="Columns" DragCompleted="sidePanelResizedHandler" Grid.Row="1"/>
         <GridSplitter Background="#FFD1D1D1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Grid.Row="2" DragCompleted="itemEditorResized" Grid.ColumnSpan="2"/>
-        <TabControl x:Name="sidePanel" Margin="0,0,5,0" Grid.Row="1" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" TabStripPlacement="Right" RenderTransformOrigin="0.5,0.5">
+        <TabControl x:Name="sidePanel" Margin="0,0,5,0" Grid.Row="1" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+            <!--
             <TabItem>
                 <TabItem.Header>
                     <TextBlock Text="Debug Text" Margin="0,3" TextOptions.TextFormattingMode="Display">
-                        <TextBlock.LayoutTransform>
-                            <TransformGroup>
-                                <ScaleTransform/>
-                                <SkewTransform/>
-                                <RotateTransform Angle="90"/>
-                                <TranslateTransform/>
-                            </TransformGroup>
-                        </TextBlock.LayoutTransform>
                     </TextBlock>
                 </TabItem.Header>
                 <ScrollViewer Background="WhiteSmoke" VerticalScrollBarVisibility="Auto">
                     <TextBlock x:Name="debugWindow" TextWrapping="Wrap"/>
                 </ScrollViewer>
             </TabItem>
+            -->
             <TabItem>
+                <TabItem.Resources>
+                    
+                    <DataTemplate x:Key="fileNameTemplate">
+                        <TextBlock Text="{Binding Path=name}"/>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="fileTypeTemplate">
+                        <TextBlock Text="{Binding Path=kind}"/>
+                    </DataTemplate>
+
+                </TabItem.Resources>
                 <TabItem.Header>
                     <TextBlock Text="Working Directory" Margin="0,3" TextOptions.TextFormattingMode="Display">
-                        <TextBlock.LayoutTransform>
-                            <TransformGroup>
-                                <ScaleTransform/>
-                                <SkewTransform/>
-                                <RotateTransform Angle="90"/>
-                                <TranslateTransform/>
-                            </TransformGroup>
-                        </TextBlock.LayoutTransform>
                     </TextBlock>
                 </TabItem.Header>
                 <ScrollViewer Background="White" VerticalScrollBarVisibility="Auto">
-                    <TextBlock x:Name="FileWindow" TextWrapping="Wrap"/>
+                    <ListView x:Name="FileListWindow" SelectionMode="Single" MouseDoubleClick="listViewItemDoubleCLick">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Name" CellTemplate="{StaticResource fileNameTemplate}"/>
+                                <GridViewColumn Header="Type" CellTemplate="{StaticResource fileTypeTemplate}"/>
+                            </GridView>
+                        </ListView.View>
+
+                    </ListView>
                 </ScrollViewer>
             </TabItem>
         </TabControl>

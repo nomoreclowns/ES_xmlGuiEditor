@@ -33,6 +33,7 @@ namespace ES_XML_Editor
         private controllerManipulateSetting contSettingHandler;
         private controllerAddItem contItemAdder;
         private controllerEditItem contItemEditor;
+        private controllerFolderContents contGetFolderContents;
 
         #endregion
 
@@ -91,11 +92,6 @@ namespace ES_XML_Editor
             {
                 itemEditorDataElement = value;
                 OnPropertyChanged("itemEditorData");
-                //if (value != null)
-                //{
-                //    itemEditorDataElement = value;
-                //    OnPropertyChanged("itemEditorData");
-                //}
             }
             get
             {
@@ -103,44 +99,48 @@ namespace ES_XML_Editor
             }
         }
 
-        private CollectionView dataViewSource;
+        private CollectionView oldDataViewSource;
 
-        public CollectionView dataView
+        public CollectionView oldDataView
         {
             set
             {
                 if (value != null)
                 {
-                    dataViewSource = value;
+                    oldDataViewSource = value;
                     OnPropertyChanged("dataView");
                 }
             }
             get
             {
-                return dataViewSource;
+                return oldDataViewSource;
             }
         }
 
+        private CollectionView fileList;
+
+        private List<CollectionView> dataSourceContainer;
+
         //list of indeces for all select items in Listbox
-        private int[] listBoxSelectedItems
-        {
-            get
-            {
-                try
-                {
-                    int[] someArray = new int[windowListbox.SelectedItems.Count];
-                    for (int i = 0; i < windowListbox.SelectedItems.Count; i++)
-                    {
-                        someArray[i] = windowListbox.Items.IndexOf(windowListbox.SelectedItems[i]);
-                    }
-                    return someArray;
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-        }
+        //private int[] listBoxSelectedItems
+        //{
+        //    get
+        //    {
+        //        try
+        //        {
+        //            int[] someArray = new int[windowListbox.SelectedItems.Count];
+        //            for (int i = 0; i < windowListbox.SelectedItems.Count; i++)
+        //            {
+        //                someArray[i] = windowListbox.Items.IndexOf(windowListbox.SelectedItems[i]);
+        //            }
+        //            return someArray;
+        //        }
+        //        catch
+        //        {
+        //            return null;
+        //        }
+        //    }
+        //}
 
 
         /* ************************************************************************************************************************
@@ -155,10 +155,11 @@ namespace ES_XML_Editor
             }
             editorFunctions.retrieveDelegates(out contErrorDisplayer, out contProgramCloser);
             editorDataFunctions.retrieveDelegates(out contBinder, out contDataGetter, out contItemAdder, out contItemEditor);
-            editorMiscFunctions.retrieveDelegates(out contFileOpener, out contSettingHandler, out contFileSaver);
+            editorMiscFunctions.retrieveDelegates(out contFileOpener, out contSettingHandler, out contFileSaver, out contGetFolderContents);
 
             //windowListbox.ItemsSource = dataView;
 
+            dataSourceContainer = new List<CollectionView>();
             itemEditorDataElement = new xmlElem();
         }
 
@@ -188,12 +189,13 @@ namespace ES_XML_Editor
                 listItemHeightSlider.Value = listItemHeightSlider.Minimum;
             }
 
-            contBinder(ref dataViewSource);
-            dataView = dataViewSource;
+            //contBinder(ref oldDataViewSource);
+            //oldDataView = oldDataViewSource;
             
             try
             {
                 itemEditorText1.Text = "Selected Item Indeces: ";
+
                 Binding myBinding = new Binding("itemEditorData");
                 myBinding.Mode = BindingMode.TwoWay;
                 myBinding.ElementName = "PrimaryWindow";
@@ -213,14 +215,23 @@ namespace ES_XML_Editor
                 if (sidePanelWidthString != null && sidePanelWidthString != "")
                 {
                     sidePanelArea.Width = new GridLength(sidePanelWidthValue);
-                    return;
                 }
-                sidePanelArea.Width = new GridLength(100.0, GridUnitType.Pixel);
+                else
+                {
+                    sidePanelArea.Width = new GridLength(100.0, GridUnitType.Pixel);
+                }
             }
             catch
             {
                 sidePanelArea.Width = new GridLength(100.0, GridUnitType.Pixel);
             }
+
+            try
+            {
+                contGetFolderContents(out fileList);
+                FileListWindow.ItemsSource = fileList;
+            }
+            catch { }
         }
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
@@ -233,10 +244,25 @@ namespace ES_XML_Editor
          *************************************************************************************************************************/
         private void openFileButtonClick(object sender, RoutedEventArgs e)
         {
-            contFileOpener();
+            String tabItemHeader;
 
-            contBinder(ref dataViewSource);
-            dataView = dataViewSource;
+            contFileOpener(out tabItemHeader);
+
+            dataSourceContainer.Clear();
+
+            contGetFolderContents(out fileList);
+
+            CollectionView tempDataView;
+
+            contBinder(out tempDataView, 0);
+
+            dataSourceContainer.Add(tempDataView);
+
+            xmlTabControl.Items.Add(generateTabItem(ref tempDataView, tabItemHeader));
+
+            (xmlTabControl.Items[0] as TabItem).IsSelected = true;
+            
+            //oldDataView = oldDataViewSource;
 
             itemEditorText1.Text = "Selected Item Indeces: ";
             //itemEditorText2.Text = "None";
@@ -244,29 +270,44 @@ namespace ES_XML_Editor
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
+        private TabItem generateTabItem(ref CollectionView contentView, String itemHeader)
+        {
+            TabItem tabbedItem = new TabItem();
+
+            //CustomListbox temp = new CustomListbox(ref contentView);
+
+
+            tabbedItem.Content = new CustomListbox(ref contentView);
+            tabbedItem.Header = itemHeader;
+
+            return tabbedItem;
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
         private void windowListBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            try
-            {
-                xmlElem tempElement = null;
-                contDataGetter(listBoxSelectedItems, ref itemEditorDataElement);
-                itemEditorData = itemEditorDataElement;
-                //listBoxItemViewer.Content = itemEditorData;
-                debugWindow.Text = itemEditorData.ToString();
-                //Binding myBinding = new Binding("itemEditorData");
-                //myBinding.Mode = BindingMode.TwoWay;
-                //myBinding.ElementName = "PrimaryWindow";
-                //myBinding.Path = new PropertyPath(itemEditorData);
-                //listBoxItemViewer.SetBinding(ScrollViewer.ContentProperty, myBinding);
+            //try
+            //{
+            //    xmlElem tempElement = null;
+            //    contDataGetter(listBoxSelectedItems, ref itemEditorDataElement);
+            //    itemEditorData = itemEditorDataElement;
+            //    //listBoxItemViewer.Content = itemEditorData;
+            //    debugWindow.Text = itemEditorData.ToString();
+            //    //Binding myBinding = new Binding("itemEditorData");
+            //    //myBinding.Mode = BindingMode.TwoWay;
+            //    //myBinding.ElementName = "PrimaryWindow";
+            //    //myBinding.Path = new PropertyPath(itemEditorData);
+            //    //listBoxItemViewer.SetBinding(ScrollViewer.ContentProperty, myBinding);
 
-                String temp = "";
-                foreach (int index in listBoxSelectedItems)
-                {
-                    temp += index.ToString() + ", ";
-                }
-                itemEditorHeading = temp;
-            }
-            catch { }
+            //    String temp = "";
+            //    foreach (int index in listBoxSelectedItems)
+            //    {
+            //        temp += index.ToString() + ", ";
+            //    }
+            //    itemEditorHeading = temp;
+            //}
+            //catch { }
         }
 
         /* ************************************************************************************************************************
@@ -343,46 +384,51 @@ namespace ES_XML_Editor
          *************************************************************************************************************************/
         private void saveItem(object sender, RoutedEventArgs e)
         {
-            int tempIndex = windowListbox.SelectedIndex;
+            //int tempIndex = windowListbox.SelectedIndex;
 
-            contItemEditor(this.itemEditorData, this.listBoxSelectedItems);
+            //contItemEditor(this.itemEditorData, this.listBoxSelectedItems);
 
-            contBinder(ref dataViewSource);
-            dataView = dataViewSource;
+            //contBinder(ref oldDataViewSource);
+            //oldDataView = oldDataViewSource;
 
-            windowListbox.SelectedIndex = tempIndex;
+            //windowListbox.SelectedIndex = tempIndex;
         }
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        private void viewerItemTextChanged(object sender, TextChangedEventArgs e)
-        {
-            String tempObject = e.Source.ToString();
+        //private void viewerItemTextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    String tempObject = e.Source.ToString();
 
-            String tempText = (e.Source as TextBox).Text;
-        }
+        //    String tempText = (e.Source as TextBox).Text;
+        //}
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
         private void saveFileButtonClicked(object sender, RoutedEventArgs e)
         {
-            contFileSaver();
+            //contFileSaver();
         }
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
         private void duplicateItemClick(object sender, RoutedEventArgs e)
         {
-            int listIndex= windowListbox.Items.Count;
-            try
-            {
-                contItemAdder(new xmlElem(itemEditorData));
-                //contBinder(ref dataViewSource);
-                //dataView = dataViewSource;
+            //int listIndex= windowListbox.Items.Count;
+            //try
+            //{
+            //    contItemAdder(new xmlElem(itemEditorData));
+            //    //contBinder(ref dataViewSource);
+            //    //dataView = dataViewSource;
 
-                windowListbox.SelectedItem = windowListbox.Items[listIndex];
-            }
-            catch { }
+            //    windowListbox.SelectedItem = windowListbox.Items[listIndex];
+            //}
+            //catch { }
+        }
+
+        private void listViewItemDoubleCLick(object sender, MouseButtonEventArgs e)
+        {
+
         }
 
         

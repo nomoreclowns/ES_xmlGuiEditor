@@ -7,33 +7,38 @@ namespace ES_XML_Editor
 {
     public delegate void controllerManipulateSetting(EditorController.EditorSettings delSettingKey, ref String delSettingValue, bool delSaveSetting = false);
 
-    public delegate void controllerOpenFile(bool delBool = false);
+    public delegate void controllerOpenFile(out String delShortFileName, bool delBool = true);
 
-    public delegate void controllerOpenFile(String delFileName, ref CollectionView delCollectionView);
+    //public delegate void controllerOpenNewFile(out CollectionView delCollectionView, String delFileName);
 
-    public delegate void controllerOpenFile(int delFileIndex, ref CollectionView delCollectionView);
+    public delegate void controllerOpenNewFile(out CollectionView delCollectionView, int delFileDataSelector);
 
-    public delegate void controllerBind(ref CollectionView delcollectionView);
+    public delegate void controllerFolderContents(out CollectionView delCollectionView);
 
-    public delegate void controllerBind(ref CollectionView delcollectionView, int delFileDataSelector);
+    //public delegate void controllerBind(out CollectionView delCollectionView);
+
+    public delegate void controllerBind(out CollectionView delCollectionView, int delFileDataSelector);
 
     public delegate void controllerShowError(String delMessageOfDoom);
 
-    public delegate void controllerSave();
+    //public delegate void controllerSave();
 
     public delegate void controllerSave(int delFileDataSelector);
 
-    public delegate void controllerAddItem(xmlElem delData);
+    //public delegate void controllerAddItem(xmlElem delData);
 
     public delegate void controllerAddItem(xmlElem delData, int delFileDataSelector);
 
-    public delegate void controllerEditItem(xmlElem delData, int[] delSelectedIndeces);
+    //public delegate void controllerEditItem(xmlElem delData, int[] delSelectedIndeces);
 
     public delegate void controllerEditItem(xmlElem delData, int[] delSelectedIndeces, int delFileDataSelector);
 
-    public delegate void controllerGetSelectedData(int[] delIndices, ref xmlElem delItemContainer);
+    //public delegate void controllerGetSelectedData(int[] delIndices, ref xmlElem delItemContainer);
+
+    public delegate void controllerGetSelectedData(int[] delIndices, ref xmlElem delItemContainer, int delFileDataSelector);
 
     public delegate void controllerClose();
+
 
     public class controllerDataDelegateContainer
     {
@@ -64,19 +69,22 @@ namespace ES_XML_Editor
         private controllerSave pFileSaver;
         private controllerOpenFile pFileOpener;
         private controllerManipulateSetting pSettingHandler;
+        private controllerFolderContents pContentsGetter;
 
-        public controllerMiscDelegateContainer(controllerOpenFile iFileOpener, controllerManipulateSetting iSettingHandler, controllerSave iFileSaver)
+        public controllerMiscDelegateContainer(controllerOpenFile iFileOpener, controllerManipulateSetting iSettingHandler, controllerSave iFileSaver, controllerFolderContents iContentsGetter)
         {
             pFileOpener = iFileOpener;
             pFileSaver = iFileSaver;
             pSettingHandler = iSettingHandler;
+            pContentsGetter = iContentsGetter;
         }
 
-        public void retrieveDelegates(out controllerOpenFile iFileOpener, out controllerManipulateSetting iSettingHandler, out controllerSave iFileSaver)
+        public void retrieveDelegates(out controllerOpenFile iFileOpener, out controllerManipulateSetting iSettingHandler, out controllerSave iFileSaver, out controllerFolderContents iContentsGetter)
         {
             iFileOpener = pFileOpener;
             iFileSaver = pFileSaver;
             iSettingHandler = pSettingHandler;
+            iContentsGetter = pContentsGetter;
         }
     }
 
