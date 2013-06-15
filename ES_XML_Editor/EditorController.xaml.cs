@@ -149,7 +149,7 @@ namespace ES_XML_Editor
 
         // list that stores the contents of a file
         private List<xmlElem> dataContainerList;
-        private xmlElem oldDataSource;
+        //private xmlElem oldDataSource;
 
         // folder where program places important files (like user settings file)
         private String ProgramStoringFolder;
@@ -161,30 +161,30 @@ namespace ES_XML_Editor
         private MainWindow baseWindowObject;
 
         // the current "view" of the list
-        private CollectionView oldDataView;
+        //private CollectionView oldDataView;
 
 
 
         private List<FileHandler> filesOpen;
-        private FileHandler currentFile;
+        //private FileHandler currentFile;
 
         private DirectoryHandler workingDirectory;
         
-        public xmlElem oldDataContainer
-        {
-            set
-            {
-                if (value != null)
-                {
-                    oldDataSource = value;
-                    OnPropertyChanged("dataContainer");
-                }
-            }
-            get
-            {
-                return oldDataSource;
-            }
-        }
+        //public xmlElem oldDataContainer
+        //{
+        //    set
+        //    {
+        //        if (value != null)
+        //        {
+        //            oldDataSource = value;
+        //            OnPropertyChanged("dataContainer");
+        //        }
+        //    }
+        //    get
+        //    {
+        //        return oldDataSource;
+        //    }
+        //}
 
         #endregion
 
@@ -205,26 +205,27 @@ namespace ES_XML_Editor
             {
                 workingDirectory = new DirectoryHandler(tempWorkingDirectory, new controllerShowError(showErrorMessage));
 
-                String tempFileName = userSettings.getValue(EditorSettings.lastFileOpened.ToString());
+                //String tempFileName = userSettings.getValue(EditorSettings.lastFileOpened.ToString());
 
-                //testListView.ItemsSource = workingDirectory.contents;
+                //try
+                //{
+                //    currentFile = new FileHandler(workingDirectory.path + tempFileName);
 
-                try
-                {
-                    currentFile = new FileHandler(workingDirectory.path + tempFileName);
-
-                    oldDataSource = new xmlElem(currentFile.open());
-                    oldDataView = (CollectionView)CollectionViewSource.GetDefaultView(oldDataSource.xmlElements);
-                }
-                catch
-                {
-                    currentFile = new FileHandler(tempWorkingDirectory, "");
-                }
+                //    oldDataSource = new xmlElem(currentFile.open());
+                //    oldDataView = (CollectionView)CollectionViewSource.GetDefaultView(oldDataSource.xmlElements);
+                //}
+                //catch
+                //{
+                //    currentFile = new FileHandler(tempWorkingDirectory, "");
+                //}
             }
             else
             {
-                workingDirectory = new DirectoryHandler(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), new controllerShowError(showErrorMessage));
-                currentFile = new FileHandler(workingDirectory.path, "");
+                workingDirectory = new DirectoryHandler(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\", new controllerShowError(showErrorMessage));
+
+                //showErrorMessage(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\");
+
+                //currentFile = new FileHandler(workingDirectory.path, "");
             }
 
 
@@ -235,26 +236,27 @@ namespace ES_XML_Editor
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        protected void openFile(out String shortFileName, bool useNewVersion = true)
+        protected void openFile(out CollectionView guiCollectionView, out String shortFileName)
         {
             String fileDirectory;
+            guiCollectionView = null;
+            List<FileHandler> fileListHolder = filesOpen;
+            //if (useNewVersion == false)
+            //{
+            //    if (openFileChooser(out shortFileName, out fileDirectory) == true)
+            //    {
+            //        currentFile = new FileHandler(fileDirectory, shortFileName);
 
-            if (useNewVersion == false)
-            {
-                if (openFileChooser(out shortFileName, out fileDirectory) == true)
-                {
-                    currentFile = new FileHandler(fileDirectory, shortFileName);
+            //        setOrGetSetting(EditorSettings.lastDirectoryOpened, ref fileDirectory, true);
 
-                    setOrGetSetting(EditorSettings.lastDirectoryOpened, ref fileDirectory, true);
+            //        setOrGetSetting(EditorSettings.lastFileOpened, ref shortFileName, true);
 
-                    setOrGetSetting(EditorSettings.lastFileOpened, ref shortFileName, true);
+            //        oldDataSource = new xmlElem(currentFile.open());
 
-                    oldDataSource = new xmlElem(currentFile.open());
-
-                    oldDataView = (CollectionView)CollectionViewSource.GetDefaultView(oldDataContainer.xmlElements);
-                }
-                return;
-            }
+            //        oldDataView = (CollectionView)CollectionViewSource.GetDefaultView(oldDataContainer.xmlElements);
+            //    }
+            //    return;
+            //}
 
             if (openFileChooser(out shortFileName, out fileDirectory) == true)
             {
@@ -264,15 +266,19 @@ namespace ES_XML_Editor
 
                 //setOrGetSetting(EditorSettings.lastFileOpened, ref shortFileName, true);
 
-                xmlElem tempDataElement = new xmlElem(currentFile.open());
+                xmlElem tempDataElement = new xmlElem(tempFileHandler.open());
 
                 //dataContainerView = (CollectionView)CollectionViewSource.GetDefaultView(dataContainer.xmlElements);
                 filesOpen.Clear();
                 filesOpen.Add(tempFileHandler);
                 dataContainerList.Clear();
                 dataContainerList.Add(tempDataElement);
-            }
 
+                bindFunction(out guiCollectionView, 0);
+
+                return;
+            }
+            filesOpen = fileListHolder;
         }
 
         protected void openAnotherFile(out CollectionView guiCollectionView, String fileName)
@@ -296,7 +302,12 @@ namespace ES_XML_Editor
 
         protected void openAnotherFile(out CollectionView guiCollectionView, int fileNameIndex)
         {
-            FileHandler tempFileHandler = new FileHandler(workingDirectory.path, filesOpen[fileNameIndex].fileName);
+            //FileHandler tempFileHandler = new FileHandler(workingDirectory.path, filesOpen[fileNameIndex].fileName);
+            String t1 = workingDirectory.path;
+            String t2 = workingDirectory.contents[fileNameIndex].name;
+
+            //FileHandler tempFileHandler = new FileHandler(workingDirectory.path, workingDirectory.contents[fileNameIndex].name);
+            FileHandler tempFileHandler = new FileHandler(t1, t2);
             xmlElem tempDataElement = new xmlElem(tempFileHandler.open());
 
             try
@@ -322,22 +333,22 @@ namespace ES_XML_Editor
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        protected void bindFunction(out CollectionView guiCollectionView)
-        {
-            //guiListBox.ItemsSource = dataContainerView;
-            try
-            {
-                //guiCollectionView = dataContainerView;
+        //protected void bindFunction(out CollectionView guiCollectionView)
+        //{
+        //    //guiListBox.ItemsSource = dataContainerView;
+        //    try
+        //    {
+        //        //guiCollectionView = dataContainerView;
 
-                guiCollectionView = (CollectionView)CollectionViewSource.GetDefaultView(oldDataContainer.xmlElements);
-            }
-            catch
-            {
-                //temporary error message
-                showErrorMessage("Could not bind to xml");
-                guiCollectionView = null;
-            }
-        }
+        //        guiCollectionView = (CollectionView)CollectionViewSource.GetDefaultView(oldDataContainer.xmlElements);
+        //    }
+        //    catch
+        //    {
+        //        //temporary error message
+        //        showErrorMessage("Could not bind to xml");
+        //        guiCollectionView = null;
+        //    }
+        //}
 
         protected void bindFunction(out CollectionView guiCollectionView, int fileDataSelector)
         {
@@ -358,21 +369,21 @@ namespace ES_XML_Editor
          * if there is a single item selected, it returns that items data,
          * if there are multiple items, returns an empty item that mimics the structure of the items
          *************************************************************************************************************************/
-        protected void selectData(int[] indices, ref xmlElem itemContainer)
-        {
-            if (indices.Length == 0)
-            {
-                return;
-            }
-            else if (indices.Length == 1)
-            {
-                itemContainer = oldDataSource.xmlElements[indices[0]];
-            }
-            else
-            {
-                itemContainer = createItem(oldDataSource.xmlElements[indices[0]]);
-            }
-        }
+        //protected void selectData(int[] indices, ref xmlElem itemContainer)
+        //{
+        //    if (indices.Length == 0)
+        //    {
+        //        return;
+        //    }
+        //    else if (indices.Length == 1)
+        //    {
+        //        itemContainer = oldDataSource.xmlElements[indices[0]];
+        //    }
+        //    else
+        //    {
+        //        itemContainer = createItem(oldDataSource.xmlElements[indices[0]]);
+        //    }
+        //}
 
         protected void selectData(int[] indices, ref xmlElem itemContainer, int fileDataSelector)
         {
@@ -395,11 +406,11 @@ namespace ES_XML_Editor
         /* ************************************************************************************************************************
          * a wrapper function for the Xcontainer Add() method that gets passed to other classes through a delegate
          *************************************************************************************************************************/
-        protected void addData(xmlElem source)
-        {
-            oldDataSource.AddElement(source);
-            //OnPropertyChanged("dataContainer");
-        }
+        //protected void addData(xmlElem source)
+        //{
+        //    oldDataSource.AddElement(source);
+        //    //OnPropertyChanged("dataContainer");
+        //}
 
         protected void addData(xmlElem source, int fileDataSelector)
         {
@@ -408,22 +419,22 @@ namespace ES_XML_Editor
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        protected void editData(xmlElem data, int[] selectedIndeces)
-        {
-            //List<xmlElem> temp= new List<xmlElem>(dataContainer.xmlElements);
+        //protected void editData(xmlElem data, int[] selectedIndeces)
+        //{
+        //    //List<xmlElem> temp= new List<xmlElem>(dataContainer.xmlElements);
 
-            if (selectedIndeces.Length == 1)
-            {
-                foreach (int index in selectedIndeces)
-                {
-                    //XAttribute childAttribute = temp[index].Attribute("Name");
-                    oldDataSource.replaceChildByAttrValue("Name", oldDataSource.xmlElements[index].Attribute("Name").Value, data);
+        //    if (selectedIndeces.Length == 1)
+        //    {
+        //        foreach (int index in selectedIndeces)
+        //        {
+        //            //XAttribute childAttribute = temp[index].Attribute("Name");
+        //            oldDataSource.replaceChildByAttrValue("Name", oldDataSource.xmlElements[index].Attribute("Name").Value, data);
                     
                     
-                }
-            }
-            OnPropertyChanged("dataContainer");
-        }
+        //        }
+        //    }
+        //    OnPropertyChanged("dataContainer");
+        //}
 
         protected void editData(xmlElem data, int[] selectedIndeces, int fileDataSelector)
         {
@@ -434,9 +445,9 @@ namespace ES_XML_Editor
                 foreach (int index in selectedIndeces)
                 {
                     //XAttribute childAttribute = temp[index].Attribute("Name");
-                    dataContainerList[fileDataSelector].replaceChildByAttrValue("Name", oldDataSource.xmlElements[index].Attribute("Name").Value, data);
+                    dataContainerList[fileDataSelector].replaceChildByAttrValue("Name", dataContainerList[fileDataSelector].xmlElements[index].Attribute("Name").Value, data);
 
-
+                    
                 }
             }
             //OnPropertyChanged("dataContainer");
@@ -470,17 +481,17 @@ namespace ES_XML_Editor
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
-        protected void saveData()
-        {
-            //showErrorMessage(dataContainerSource.ToString());
-            currentFile.setFileContent(oldDataSource);
-            currentFile.save();
-        }
+        //protected void saveData()
+        //{
+        //    //showErrorMessage(dataContainerSource.ToString());
+        //    currentFile.setFileContent(oldDataSource);
+        //    currentFile.save();
+        //}
 
         protected void saveData(int fileDataSelector)
         {
             //showErrorMessage(dataContainerSource.ToString());
-            filesOpen[fileDataSelector].setFileContent(oldDataSource);
+            filesOpen[fileDataSelector].setFileContent(dataContainerList[fileDataSelector]);
             filesOpen[fileDataSelector].save();
             //currentFile.setFileContent(oldDataSource);
             //currentFile.save();
@@ -531,8 +542,8 @@ namespace ES_XML_Editor
         protected void showPrimaryWindow()
         {
             controllerDelegateContainer tempItem1 = new controllerDelegateContainer(showErrorMessage, closeProgram);
-            controllerDataDelegateContainer tempItem2 = new controllerDataDelegateContainer(bindFunction, selectData, addData, editData);
-            controllerMiscDelegateContainer tempItem3 = new controllerMiscDelegateContainer(openFile, setOrGetSetting, saveData, passFolderContents);
+            controllerDataDelegateContainer tempItem2 = new controllerDataDelegateContainer(selectData, addData, editData);
+            controllerMiscDelegateContainer tempItem3 = new controllerMiscDelegateContainer(openFile, openAnotherFile, setOrGetSetting, saveData, passFolderContents);
 
             Double height = Convert.ToDouble(userSettings.getValue(EditorSettings.editingWindowHeight.ToString()));
             Double width = Convert.ToDouble(userSettings.getValue(EditorSettings.editingWindowWidth.ToString()));
@@ -588,8 +599,6 @@ namespace ES_XML_Editor
             {
                 tempAttr = temp.Attribute(attr.Name.ToString());
                 tempAttr.Value = "";
-                 
-                
             }
             foreach (xmlElem item in source.Elements)
             {
@@ -613,7 +622,6 @@ namespace ES_XML_Editor
             }
             catch
             {
-
                 Directory.CreateDirectory(ProgramStoringFolder);
                 userSettings = new KeyValuePairDataBase();
                 userSettings.saveToFile(settingsPath);
@@ -653,140 +661,5 @@ namespace ES_XML_Editor
 
     }//end of class
 
-    public class ioObject
-    {
-        public enum Filetype
-        {
-            File,
-            Folder
-        }
-
-        protected String pName = "";
-
-        protected Filetype pKind;
-
-        public String name
-        {
-            get
-            {
-                return pName;
-            }
-        }
-
-        public String kind
-        {
-            get
-            {
-                return pKind.ToString();
-            }
-        }
-
-        public ioObject.Filetype fileKind
-        {
-            get
-            {
-                return pKind;
-            }
-        }
-
-        public ioObject(String iName, ioObject.Filetype iKind)
-        {
-            pName = iName;
-
-            pKind = iKind;
-        }
-    }
-
-    public class DirectoryHandler
-    {
-        private controllerShowError contDisplayError;
-        private String pDirectoryPath;
-        private DirectoryInfo parent;
-
-        private List<ioObject> pContents;
-
-        public String path
-        {
-            get
-            {
-                return pDirectoryPath;
-            }
-        }
-
-        public List<ioObject> contents
-        {
-            get
-            {
-                return pContents;
-            }
-        }
-
-        /* ************************************************************************************************************************
-         *************************************************************************************************************************/
-        public DirectoryHandler(String dirPath, controllerShowError DisplayError)
-        {
-            contDisplayError = DisplayError;
-
-            pContents= new List<ioObject>();
-
-            pDirectoryPath = dirPath;
-
-            retrieveContents();
-
-            try
-            {
-                parent = Directory.GetParent(pDirectoryPath);
-            }
-            catch
-            {
-                contDisplayError("unable to retrieve parent of folder "+dirPath);
-            }
-
-
-        }
-
-        /* ************************************************************************************************************************
-         *************************************************************************************************************************/
-        protected void retrieveContents()
-        {
-            if (Directory.Exists(pDirectoryPath) == true)
-            {
-
-                int pathLength = pDirectoryPath.Length;
-
-                try
-                {
-                    String[] directoryArray = Directory.GetDirectories(pDirectoryPath, "*", SearchOption.TopDirectoryOnly);
-
-                    for (int i = 0; i < directoryArray.Length; i++)
-                    {
-                        pContents.Add(new ioObject(directoryArray[i].Substring(pathLength), ioObject.Filetype.Folder));
-                    }
-                }
-                catch
-                {
-                    contDisplayError("Could not retrieve directories.");
-                }
-                try
-                {
-                    String[] fileArray = Directory.GetFiles(pDirectoryPath, "*", SearchOption.TopDirectoryOnly);
-
-                    for (int i = 0; i < fileArray.Length; i++)
-                    {
-                        pContents.Add(new ioObject(fileArray[i].Substring(pathLength), ioObject.Filetype.File));
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw e;
-                }
-                return;
-            }
-            else
-            {
-                contDisplayError("Cannot show a directory that does not exist");
-            }
-        }
-    }
 
 }

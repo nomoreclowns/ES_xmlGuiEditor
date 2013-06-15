@@ -7,7 +7,7 @@ namespace ES_XML_Editor
 {
     public delegate void controllerManipulateSetting(EditorController.EditorSettings delSettingKey, ref String delSettingValue, bool delSaveSetting = false);
 
-    public delegate void controllerOpenFile(out String delShortFileName, bool delBool = true);
+    public delegate void controllerOpenFile(out CollectionView delCollectionView, out String delShortFileName);
 
     //public delegate void controllerOpenNewFile(out CollectionView delCollectionView, String delFileName);
 
@@ -17,7 +17,7 @@ namespace ES_XML_Editor
 
     //public delegate void controllerBind(out CollectionView delCollectionView);
 
-    public delegate void controllerBind(out CollectionView delCollectionView, int delFileDataSelector);
+    //public delegate void controllerBind(out CollectionView delCollectionView, int delFileDataSelector);
 
     public delegate void controllerShowError(String delMessageOfDoom);
 
@@ -43,21 +43,21 @@ namespace ES_XML_Editor
     public class controllerDataDelegateContainer
     {
         private controllerGetSelectedData pSelectedDataGetter;
-        private controllerBind pBinder;
+        //private controllerBind pBinder;
         private controllerAddItem pItemAdder;
         private controllerEditItem pItemEditor;
 
-        public controllerDataDelegateContainer(controllerBind iBinder, controllerGetSelectedData iSelectedDataGetter, controllerAddItem iItemAdder, controllerEditItem iItemEditor)
+        public controllerDataDelegateContainer(controllerGetSelectedData iSelectedDataGetter, controllerAddItem iItemAdder, controllerEditItem iItemEditor)
         {
-            pBinder = iBinder;
+            //pBinder = iBinder;
             pSelectedDataGetter = iSelectedDataGetter;
             pItemAdder = iItemAdder;
             pItemEditor = iItemEditor;
         }
 
-        public void retrieveDelegates(out controllerBind iBinder, out controllerGetSelectedData iSelectedDataGetter, out controllerAddItem iItemAdder, out controllerEditItem iItemEditor)
+        public void retrieveDelegates(out controllerGetSelectedData iSelectedDataGetter, out controllerAddItem iItemAdder, out controllerEditItem iItemEditor)
         {
-            iBinder = pBinder;
+            //iBinder = pBinder;
             iSelectedDataGetter = pSelectedDataGetter;
             iItemAdder = pItemAdder;
             iItemEditor = pItemEditor;
@@ -68,19 +68,22 @@ namespace ES_XML_Editor
     {
         private controllerSave pFileSaver;
         private controllerOpenFile pFileOpener;
+        private controllerOpenNewFile pNewFileOpener;
         private controllerManipulateSetting pSettingHandler;
         private controllerFolderContents pContentsGetter;
 
-        public controllerMiscDelegateContainer(controllerOpenFile iFileOpener, controllerManipulateSetting iSettingHandler, controllerSave iFileSaver, controllerFolderContents iContentsGetter)
+        public controllerMiscDelegateContainer(controllerOpenFile iFileOpener, controllerOpenNewFile iNewFileOpener, controllerManipulateSetting iSettingHandler, controllerSave iFileSaver, controllerFolderContents iContentsGetter)
         {
             pFileOpener = iFileOpener;
+            pNewFileOpener = iNewFileOpener;
             pFileSaver = iFileSaver;
             pSettingHandler = iSettingHandler;
             pContentsGetter = iContentsGetter;
         }
 
-        public void retrieveDelegates(out controllerOpenFile iFileOpener, out controllerManipulateSetting iSettingHandler, out controllerSave iFileSaver, out controllerFolderContents iContentsGetter)
+        public void retrieveDelegates(out controllerOpenFile iFileOpener, out controllerOpenNewFile iNewFileOpener, out controllerManipulateSetting iSettingHandler, out controllerSave iFileSaver, out controllerFolderContents iContentsGetter)
         {
+            iNewFileOpener = pNewFileOpener;
             iFileOpener = pFileOpener;
             iFileSaver = pFileSaver;
             iSettingHandler = pSettingHandler;

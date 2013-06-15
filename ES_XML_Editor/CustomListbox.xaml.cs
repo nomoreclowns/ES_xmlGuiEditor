@@ -34,7 +34,7 @@ namespace ES_XML_Editor
             }
         }
 
-        private int[] listBoxSelectedItems
+        public int[] listBoxSelectedItems
         {
             get
             {
@@ -64,21 +64,20 @@ namespace ES_XML_Editor
             }
         }
 
-        //public CustomListbox()
-        //{
-        //    InitializeComponent();
-        //}
-
         public CustomListbox(ref CollectionView iBindableView)
         {
             InitializeComponent();
 
             pBindableView = iBindableView;
-            //tabItemListbox.ItemsSource = dataView;
             OnPropertyChanged("dataView");
         }
 
         private void listboxSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void itemHeightSliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
 
         }

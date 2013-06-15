@@ -824,7 +824,6 @@ namespace ES_XML_Editor
         #endregion
     }
 
-    #region obsolete
     public class xmlDoc
     {
         private XDeclaration xmlDeclaration;
@@ -894,7 +893,7 @@ namespace ES_XML_Editor
 
         public override string ToString()
         {
-            String temp="";
+            String temp = "";
 
             if (xmlDeclaration != null || xmlDeclaration.ToString() != "")
             {
@@ -907,6 +906,7 @@ namespace ES_XML_Editor
         }
     }
 
+    #region obsolete
 
     public class xmlAttribute : XAttribute, INotifyPropertyChanged
     {

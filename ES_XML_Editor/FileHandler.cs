@@ -70,6 +70,28 @@ namespace ES_XML_Editor
             }
         }
 
+        static public xmlDoc open(String filePath)
+        {
+            try
+            {
+                try
+                {
+                    //load xml file as a single element representing the root node
+                    XDocument temp = new XDocument(XDocument.Load(filePath));
+
+                    return new xmlDoc(temp);
+                }
+                catch { }
+                //xmlDoc xmlFile = new xmlDoc(temp);
+
+                return new xmlDoc();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public void setFileContent(xmlElem content)
         {
             xmlFile.root = content;
@@ -90,10 +112,10 @@ namespace ES_XML_Editor
         //    }
         //}
 
-        //public void save(xmlDoc data)
-        //{
-        //    File.WriteAllText((handledDirectory + handledFileName), data.ToString(), System.Text.Encoding.UTF8);
-        //}
+        static public void save(xmlDoc data, String filePath)
+        {
+            File.WriteAllText(filePath, data.ToString(), System.Text.Encoding.UTF8);
+        }
 
         //public void save(xmlElement data)
         //{

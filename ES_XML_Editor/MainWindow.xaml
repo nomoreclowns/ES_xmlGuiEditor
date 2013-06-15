@@ -359,7 +359,15 @@
             <RowDefinition/>
             <RowDefinition x:Name="itemEditorArea"/>
         </Grid.RowDefinitions>
-        <TabControl x:Name="xmlTabControl" Grid.Column="1" Grid.Row="1">
+        <TabControl x:Name="xmlTabControl" Grid.Column="1" Grid.Row="1" SelectionChanged="xmlTabControlSelectionChanged">
+            <TabControl.Resources>
+                <DataTemplate x:Key="headerTemplate">
+                    <StackPanel>
+                        <TextBlock Margin="0,3" TextOptions.TextFormattingMode="Display"/>
+                        <Button Content="X"/>
+                    </StackPanel>
+                </DataTemplate>
+            </TabControl.Resources>
             <!--
             <TabItem Header="test">
                 <ListBox VirtualizingStackPanel.VirtualizationMode="Recycling" ItemTemplate="{StaticResource xmlListItemTemplate}" x:Name="windowListbox" Background="#FFF1F1F1" SelectionChanged="windowListBoxSelectionChanged" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Auto" Padding="5,0,10,0" ScrollViewer.CanContentScroll="False" IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding dataView, ElementName=PrimaryWindow, Mode=OneWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}">
@@ -373,14 +381,16 @@
             -->
         </TabControl>
         <DockPanel Background="#FFD1D1D1" Grid.ColumnSpan="2" LastChildFill="False" ScrollViewer.VerticalScrollBarVisibility="Disabled">
-            <Button Content="Open File" HorizontalAlignment="Left" Click="openFileButtonClick"/>
+            <Button x:Name="openFileButton" Content="Open File" HorizontalAlignment="Left" Click="openFileButtonClick"/>
             <StackPanel Orientation="Horizontal" Visibility="Collapsed">
                 <TextBlock TextWrapping="Wrap" Text="selected indices: " HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0"/>
                 <TextBlock x:Name="currentFileLabel" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,3.02,0,2.98"/>
                 <TextBlock TextWrapping="Wrap" Text="Full File Path: " HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0"/>
                 <TextBlock x:Name="currentFileFullPathLabel" TextWrapping="Wrap" Text="none" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,3.02,0,2.98"/>
             </StackPanel>
-            <Slider x:Name="listItemHeightSlider" Maximum="500" Minimum="100" SmallChange="10" TickPlacement="Both" TickFrequency="50" LargeChange="100" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" Width="100" Foreground="Black" DockPanel.Dock="Right" ValueChanged="itemHeightSliderValueChanged"/>
+            <!--
+            <Slider x:Name="listItemHeightSlider1" Maximum="500" Minimum="100" SmallChange="10" TickPlacement="Both" TickFrequency="50" LargeChange="100" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" Width="100" Foreground="Black" DockPanel.Dock="Right" ValueChanged="itemHeightSliderValueChanged"/>
+            -->
             <Button Content="Save File" HorizontalAlignment="Left" Click="saveFileButtonClicked"/>
         </DockPanel>
         <Grid x:Name="itemEditorPanel" Grid.Row="2" Background="#FFE6E6E6" Grid.ColumnSpan="2" >
@@ -400,19 +410,9 @@
             </StackPanel>
         </Grid>
         <GridSplitter Background="#FFD1D1D1" Width="5" ResizeDirection="Columns" DragCompleted="sidePanelResizedHandler" Grid.Row="1"/>
-        <GridSplitter Background="#FFD1D1D1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Grid.Row="2" DragCompleted="itemEditorResized" Grid.ColumnSpan="2"/>
+        <GridSplitter Background="#FFD1D1D1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Grid.Row="1" DragCompleted="itemEditorResized" Grid.ColumnSpan="2"/>
         <TabControl x:Name="sidePanel" Margin="0,0,5,0" Grid.Row="1" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
-            <!--
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Text="Debug Text" Margin="0,3" TextOptions.TextFormattingMode="Display">
-                    </TextBlock>
-                </TabItem.Header>
-                <ScrollViewer Background="WhiteSmoke" VerticalScrollBarVisibility="Auto">
-                    <TextBlock x:Name="debugWindow" TextWrapping="Wrap"/>
-                </ScrollViewer>
-            </TabItem>
-            -->
+            
             <TabItem>
                 <TabItem.Resources>
                     
@@ -426,11 +426,10 @@
 
                 </TabItem.Resources>
                 <TabItem.Header>
-                    <TextBlock Text="Working Directory" Margin="0,3" TextOptions.TextFormattingMode="Display">
-                    </TextBlock>
+                    <TextBlock Text="Working Directory" Margin="0,3" TextOptions.TextFormattingMode="Display"/>
                 </TabItem.Header>
                 <ScrollViewer Background="White" VerticalScrollBarVisibility="Auto">
-                    <ListView x:Name="FileListWindow" SelectionMode="Single" MouseDoubleClick="listViewItemDoubleCLick">
+                    <ListView x:Name="FileListWindow" SelectionMode="Single" MouseDoubleClick="fileListViewItemDoubleClick">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="Name" CellTemplate="{StaticResource fileNameTemplate}"/>
@@ -441,6 +440,17 @@
                     </ListView>
                 </ScrollViewer>
             </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="Debug Text" Margin="0,3" TextOptions.TextFormattingMode="Display">
+                    </TextBlock>
+                </TabItem.Header>
+                <ScrollViewer Background="WhiteSmoke" VerticalScrollBarVisibility="Auto">
+                    <TextBlock x:Name="debugWindow" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                </ScrollViewer>
+            </TabItem>
+            
         </TabControl>
     </Grid>
 </Window>

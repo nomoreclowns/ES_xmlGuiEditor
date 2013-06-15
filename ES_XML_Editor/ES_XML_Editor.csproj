@@ -78,6 +78,7 @@
     <Compile Include="BaseWrapPanelDataItem.xaml.cs">
       <DependentUpon>BaseWrapPanelDataItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DirectoryHandler.cs" />
     <Compile Include="ControllerDelegates.cs" />
     <Compile Include="CustomListbox.xaml.cs">
       <DependentUpon>CustomListbox.xaml</DependentUpon>

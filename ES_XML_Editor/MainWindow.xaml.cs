@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
@@ -25,7 +26,8 @@ namespace ES_XML_Editor
         #region delegateRegion
 
         private controllerOpenFile contFileOpener;
-        private controllerBind contBinder;
+        private controllerOpenNewFile contNewFileOpener;
+        //private controllerBind contBinder;
         private controllerShowError contErrorDisplayer;
         private controllerSave contFileSaver;
         private controllerClose contProgramCloser;
@@ -154,8 +156,8 @@ namespace ES_XML_Editor
                 throw new NullReferenceException("MainWindow Constructor cannot have a null references to editorFunctions, editorDataFunctions, or editorMiscFunctions");
             }
             editorFunctions.retrieveDelegates(out contErrorDisplayer, out contProgramCloser);
-            editorDataFunctions.retrieveDelegates(out contBinder, out contDataGetter, out contItemAdder, out contItemEditor);
-            editorMiscFunctions.retrieveDelegates(out contFileOpener, out contSettingHandler, out contFileSaver, out contGetFolderContents);
+            editorDataFunctions.retrieveDelegates(out contDataGetter, out contItemAdder, out contItemEditor);
+            editorMiscFunctions.retrieveDelegates(out contFileOpener, out contNewFileOpener, out contSettingHandler, out contFileSaver, out contGetFolderContents);
 
             //windowListbox.ItemsSource = dataView;
 
@@ -182,11 +184,11 @@ namespace ES_XML_Editor
             {
                 String listItemHeight = "";
                 contSettingHandler(listItemSettingEnum, ref listItemHeight);
-                listItemHeightSlider.Value = Convert.ToDouble(listItemHeight);
+                //listItemHeightSlider.Value = Convert.ToDouble(listItemHeight);
             }
             catch
             {
-                listItemHeightSlider.Value = listItemHeightSlider.Minimum;
+                //listItemHeightSlider.Value = listItemHeightSlider.Minimum;
             }
 
             //contBinder(ref oldDataViewSource);
@@ -244,29 +246,54 @@ namespace ES_XML_Editor
          *************************************************************************************************************************/
         private void openFileButtonClick(object sender, RoutedEventArgs e)
         {
-            String tabItemHeader;
-
-            contFileOpener(out tabItemHeader);
-
             dataSourceContainer.Clear();
 
-            contGetFolderContents(out fileList);
+            
+
+            String shortFileName;
 
             CollectionView tempDataView;
 
-            contBinder(out tempDataView, 0);
+            contFileOpener(out tempDataView, out shortFileName);
 
             dataSourceContainer.Add(tempDataView);
 
-            xmlTabControl.Items.Add(generateTabItem(ref tempDataView, tabItemHeader));
+            contGetFolderContents(out fileList);
+
+            dataSourceContainer.Add(tempDataView);
+
+            //getFileContents(shortFileName);
+            if (tempDataView == null)
+            {
+                return;
+            }
+
+            xmlTabControl.Items.Add(generateTabItem(ref tempDataView, shortFileName));
 
             (xmlTabControl.Items[0] as TabItem).IsSelected = true;
-            
-            //oldDataView = oldDataViewSource;
 
             itemEditorText1.Text = "Selected Item Indeces: ";
             //itemEditorText2.Text = "None";
+
+            openFileButton.IsEnabled = false;
         }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        //private void getFileContents(String tabItemHeader)
+        //{
+        //    CollectionView tempDataView;
+
+        //    contBinder(out tempDataView, 0);
+
+        //    dataSourceContainer.Add(tempDataView);
+
+        //    xmlTabControl.Items.Add(generateTabItem(ref tempDataView, tabItemHeader));
+
+        //    (xmlTabControl.Items[0] as TabItem).IsSelected = true;
+        //    //xmlTabControl.SelectedIndex = 0;
+
+        //}
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
@@ -274,14 +301,69 @@ namespace ES_XML_Editor
         {
             TabItem tabbedItem = new TabItem();
 
-            //CustomListbox temp = new CustomListbox(ref contentView);
-
+            CustomListbox temp = new CustomListbox(ref contentView);
 
             tabbedItem.Content = new CustomListbox(ref contentView);
-            tabbedItem.Header = itemHeader;
+            tabbedItem.Header = createHeaderDataTemplate(itemHeader);
 
             return tabbedItem;
         }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        private StackPanel createHeaderDataTemplate(String name)
+        {
+            StackPanel headerStackpanel = new StackPanel();
+            headerStackpanel.Orientation = Orientation.Horizontal;
+
+            Button closeFileButton = new Button();
+            closeFileButton.Content = "X";
+            closeFileButton.Click += closeFileButtonClicked;
+            closeFileButton.Margin = new Thickness(5.0, 0.0, 0.0, 0.0);
+
+            TextBlock header = new TextBlock();
+            header.Text = name;
+
+            headerStackpanel.Children.Add(header);
+            headerStackpanel.Children.Add(closeFileButton);
+
+            return headerStackpanel;
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        private void fileListViewItemDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            int tempIndex = FileListWindow.SelectedIndex;
+            String fileName = "" + (FileListWindow.Items[tempIndex] as ioObject).name;
+            
+            if (tempIndex >= 0)
+            {
+                CollectionView tempDataView;
+
+                contNewFileOpener(out tempDataView, tempIndex);
+
+                xmlTabControl.Items.Add(generateTabItem(ref tempDataView, fileName));
+
+                int lastItemIndex = xmlTabControl.Items.Count - 1;
+                (xmlTabControl.Items[lastItemIndex] as TabItem).IsSelected = true;
+            }
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        private void closeFileButtonClicked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        public void tempFunctionName()
+        {
+
+        }
+
 
         /* ************************************************************************************************************************
          *************************************************************************************************************************/
@@ -336,18 +418,13 @@ namespace ES_XML_Editor
         {
             try
             {
-                //String tempItemHeight = (sender as RowDefinition).Width.Value.ToString();
-                if ((sender as RowDefinition).Equals(itemEditorArea))
-                {
-                    String tempItemHeight = this.itemEditorArea.Height.Value.ToString();
-                    contSettingHandler(editingItemSettingEnum, ref tempItemHeight);
-                }
-                else
-                {
-                    contErrorDisplayer("A RowDefinition other than itemEditorArea has somehow been resized");
-                }
+                String tempItemHeight = this.itemEditorArea.Height.Value.ToString();
+                contSettingHandler(editingItemSettingEnum, ref tempItemHeight);
             }
-            catch { }
+            catch
+            {
+                contErrorDisplayer("Exception in MainWindow.itemEditorResized()");
+            }
         }
 
         /* ************************************************************************************************************************
@@ -374,8 +451,8 @@ namespace ES_XML_Editor
         {
             try
             {
-                String temp = listItemHeightSlider.Value.ToString();
-                contSettingHandler(listItemSettingEnum, ref temp, true);
+                //String temp = listItemHeightSlider.Value.ToString();
+                //contSettingHandler(listItemSettingEnum, ref temp, true);
             }
             catch { }
         }
@@ -426,9 +503,91 @@ namespace ES_XML_Editor
             //catch { }
         }
 
-        private void listViewItemDoubleCLick(object sender, MouseButtonEventArgs e)
+        /* ************************************************************************************************************************
+         *************************************************************************************************************************/
+        private void xmlTabControlSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            //contErrorDisplayer("tabitem with index "+xmlTabControl.SelectedIndex.ToString()+" selected");
 
+            int selectedTabIndex = xmlTabControl.SelectedIndex;
+
+            if (xmlTabControl.Items.Count >= 2)
+            {
+                try
+                {
+                    CustomListbox tempBox = ((xmlTabControl.Items[selectedTabIndex] as TabItem).Content as CustomListbox);
+                    //CustomListbox tempBox = (xmlTabControl.SelectedContent as CustomListbox);
+
+
+
+
+                    ItemCollection tempList = ((xmlTabControl.Items[selectedTabIndex] as TabItem).Content as CustomListbox).tabItemListbox.Items;
+
+                    //this.debugWindow.Text = "";
+
+                    //foreach(object item in tempList)
+                    //{
+                    //    this.debugWindow.Text += (item as xmlElem).ToString();
+                    //}
+
+
+
+
+
+                    int[] tempIndeces = tempBox.listBoxSelectedItems;
+
+                    //int[] tempIndeces = (xmlTabControl.SelectedContent as CustomListbox).listBoxSelectedItems;
+
+                    contDataGetter(tempIndeces, ref itemEditorDataElement, selectedTabIndex);
+
+                    //int[] tempIndeces = ((xmlTabControl.Items[0] as TabItem).Content as CustomListbox).listBoxSelectedItems;
+
+                    itemEditorData = itemEditorDataElement;
+                    listBoxItemViewer.Content = itemEditorData;
+                    Binding myBinding = new Binding("itemEditorData");
+                    myBinding.Mode = BindingMode.TwoWay;
+                    myBinding.ElementName = "PrimaryWindow";
+                    listBoxItemViewer.SetBinding(ScrollViewer.ContentProperty, myBinding);
+
+                    //String temp = "";
+                    //foreach (int index in listBoxSelectedItems)
+                    //{
+                    //    temp += index.ToString() + ", ";
+                    //}
+                    //itemEditorHeading = temp;
+                }
+                catch// (Exception et)
+                {
+                    //contErrorDisplayer(et.ToString());
+                }
+
+                return;
+            }
+            else if (xmlTabControl.Items.Count == 1)
+            {
+                TabItem tempItem = (xmlTabControl.Items[0] as TabItem);
+
+                CustomListbox tempBox = (tempItem.Content as CustomListbox);
+
+                try
+                {
+                    int[] tempIndeces = tempBox.listBoxSelectedItems;
+                    contDataGetter(tempIndeces, ref itemEditorDataElement, 0);
+                }
+                catch
+                {
+                    contErrorDisplayer(tempBox.listBoxSelectedItems.ToString());
+                    
+                }
+
+                //int[] tempIndeces = ((xmlTabControl.Items[0] as TabItem).Content as CustomListbox).listBoxSelectedItems;
+                itemEditorData = itemEditorDataElement;
+                listBoxItemViewer.Content = itemEditorData;
+                Binding myBinding = new Binding("itemEditorData");
+                myBinding.Mode = BindingMode.TwoWay;
+                myBinding.ElementName = "PrimaryWindow";
+                listBoxItemViewer.SetBinding(ScrollViewer.ContentProperty, myBinding);
+            }
         }
 
         

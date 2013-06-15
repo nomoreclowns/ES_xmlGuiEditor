@@ -352,8 +352,14 @@
             </DataTemplate>
 
         </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="139*"/>
+        </Grid.RowDefinitions>
 
-        <ListBox VirtualizingStackPanel.VirtualizationMode="Recycling" ItemTemplate="{StaticResource xmlListItemTemplate}" x:Name="tabItemListbox" Background="#FFF1F1F1" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Auto" Padding="5,0,10,0" ScrollViewer.CanContentScroll="False" IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding dataView, ElementName=SpecialListbox, Mode=OneWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True, diagnostics:PresentationTraceSources.TraceLevel=High}" SelectionChanged="listboxSelectionChanged">
+        <Slider x:Name="listItemHeightSlider" Maximum="500" Minimum="100" SmallChange="10" TickPlacement="Both" TickFrequency="50" LargeChange="100" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" Width="100" Foreground="Black" DockPanel.Dock="Right" ValueChanged="itemHeightSliderValueChanged" HorizontalAlignment="Right"/>
+
+        <ListBox VirtualizingStackPanel.VirtualizationMode="Recycling" ItemTemplate="{StaticResource xmlListItemTemplate}" x:Name="tabItemListbox" Background="#FFF1F1F1" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Auto" Padding="5,0,10,0" ScrollViewer.CanContentScroll="False" IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding dataView, ElementName=SpecialListbox, Mode=OneWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True, diagnostics:PresentationTraceSources.TraceLevel=High}" SelectionChanged="listboxSelectionChanged" Grid.Row="1">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel IsItemsHost="True"/>
