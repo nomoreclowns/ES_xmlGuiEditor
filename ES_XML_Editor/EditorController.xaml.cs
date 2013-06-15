@@ -163,9 +163,7 @@ namespace ES_XML_Editor
         // the current "view" of the list
         //private CollectionView oldDataView;
 
-
-
-        private List<FileHandler> filesOpen;
+        private ObservableCollection<FileHandler> filesOpen;
         //private FileHandler currentFile;
 
         private DirectoryHandler workingDirectory;
@@ -195,7 +193,7 @@ namespace ES_XML_Editor
 
             retrieveSettingsFile();
 
-            filesOpen= new List<FileHandler>();
+            filesOpen = new ObservableCollection<FileHandler>();
 
             dataContainerList = new List<xmlElem>();
 
@@ -240,7 +238,7 @@ namespace ES_XML_Editor
         {
             String fileDirectory;
             guiCollectionView = null;
-            List<FileHandler> fileListHolder = filesOpen;
+            ObservableCollection<FileHandler> fileListHolder = filesOpen;
             //if (useNewVersion == false)
             //{
             //    if (openFileChooser(out shortFileName, out fileDirectory) == true)
@@ -575,6 +573,7 @@ namespace ES_XML_Editor
                 String fullFileName = fileChooser.FileName;
                 fileName = fileChooser.SafeFileName;
                 directory = fileChooser.FileName.TrimEnd(fileName.ToCharArray());
+                workingDirectory = new DirectoryHandler(directory, new controllerShowError(showErrorMessage));
                 return true;
             }
             directory = fileName = null;

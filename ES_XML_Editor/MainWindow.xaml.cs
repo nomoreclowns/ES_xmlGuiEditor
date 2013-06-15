@@ -119,7 +119,7 @@ namespace ES_XML_Editor
             }
         }
 
-        private CollectionView fileList;
+        private CollectionView fileListCollectionView;
 
         private List<CollectionView> dataSourceContainer;
 
@@ -230,8 +230,8 @@ namespace ES_XML_Editor
 
             try
             {
-                contGetFolderContents(out fileList);
-                FileListWindow.ItemsSource = fileList;
+                contGetFolderContents(out fileListCollectionView);
+                FileListWindow.ItemsSource = fileListCollectionView;
             }
             catch { }
         }
@@ -248,7 +248,7 @@ namespace ES_XML_Editor
         {
             dataSourceContainer.Clear();
 
-            
+            xmlTabControl.Items.Clear();
 
             String shortFileName;
 
@@ -258,15 +258,19 @@ namespace ES_XML_Editor
 
             dataSourceContainer.Add(tempDataView);
 
-            contGetFolderContents(out fileList);
+            contGetFolderContents(out fileListCollectionView);
 
-            dataSourceContainer.Add(tempDataView);
+            //dataSourceContainer.Add(tempDataView);
 
             //getFileContents(shortFileName);
             if (tempDataView == null)
             {
                 return;
             }
+
+            
+
+            FileListWindow.ItemsSource = fileListCollectionView;
 
             xmlTabControl.Items.Add(generateTabItem(ref tempDataView, shortFileName));
 

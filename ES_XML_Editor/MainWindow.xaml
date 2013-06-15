@@ -428,17 +428,15 @@
                 <TabItem.Header>
                     <TextBlock Text="Working Directory" Margin="0,3" TextOptions.TextFormattingMode="Display"/>
                 </TabItem.Header>
-                <ScrollViewer Background="White" VerticalScrollBarVisibility="Auto">
-                    <ListView x:Name="FileListWindow" SelectionMode="Single" MouseDoubleClick="fileListViewItemDoubleClick">
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Header="Name" CellTemplate="{StaticResource fileNameTemplate}"/>
-                                <GridViewColumn Header="Type" CellTemplate="{StaticResource fileTypeTemplate}"/>
-                            </GridView>
-                        </ListView.View>
+                <ListView x:Name="FileListWindow" SelectionMode="Single" MouseDoubleClick="fileListViewItemDoubleClick">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Name" CellTemplate="{StaticResource fileNameTemplate}"/>
+                            <GridViewColumn Header="Type" CellTemplate="{StaticResource fileTypeTemplate}"/>
+                        </GridView>
+                    </ListView.View>
 
-                    </ListView>
-                </ScrollViewer>
+                </ListView>
             </TabItem>
 
             <TabItem>

@@ -4,11 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.ComponentModel;
 
 namespace ES_XML_Editor
 {
-    public class ioObject
+    public class ioObject// : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(String name)
+        {
+            PropertyChangedEventHandler changedHandler = PropertyChanged;
+
+            if (changedHandler != null)
+            {
+                changedHandler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
         public enum Filetype
         {
             File,
